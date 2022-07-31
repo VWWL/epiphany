@@ -91,6 +91,16 @@ public class ContainerTest {
                         () -> context.get(Component.class).get()
                 );
             }
+
+            @Test
+            void should_throw_if_cyclic_dependencies_found() {
+                context.bind(Component.class, ComponentWithInjectConstructor.class);
+                context.bind(Dependency.class, DependencyDependedOnComponent.class);
+                assertThrows(
+                        CyclicDependenciesFound.class,
+                        () -> context.get(Component.class)
+                );
+            }
         }
 
         @Nested
@@ -168,5 +178,18 @@ class DependencyWithInjectConstructor implements Dependency {
 
     public String dependency() {
         return dependency;
+    }
+}
+
+class DependencyDependedOnComponent implements Dependency {
+    private final Component component;
+
+    @Inject
+    public DependencyDependedOnComponent(Component component) {
+        this.component = component;
+    }
+
+    public Component component() {
+        return component;
     }
 }
