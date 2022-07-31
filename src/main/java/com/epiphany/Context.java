@@ -28,11 +28,16 @@ public class Context {
     }
 
     public <Type, Implementation extends Type> void bind(final Class<Type> type, final Class<Implementation> implementation) {
+        if (countOfInjectConstructors(implementation) > 1) throw new IllegalComponentException();
         providers.put(type, () -> {
             Constructor<Implementation> injectConstructor = injectConstructor(implementation);
             Object[] dependencies = stream(injectConstructor.getParameters()).map(p -> this.get(p.getType())).toArray(Object[]::new);
             return evaluate(() -> injectConstructor.newInstance(dependencies)).evaluate();
         });
+    }
+
+    private <Type> long countOfInjectConstructors(Class<Type> implementation) {
+        return stream(implementation.getConstructors()).filter(c -> c.isAnnotationPresent(Inject.class)).count();
     }
 
     @SuppressWarnings("unchecked")

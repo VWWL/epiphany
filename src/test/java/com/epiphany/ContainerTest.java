@@ -57,6 +57,14 @@ public class ContainerTest {
                 assertNotNull(dependency);
                 assertSame("Indirect dependency", ((DependencyWithInjectConstructor) dependency).dependency());
             }
+
+            @Test
+            void should_throw_when_multi_inject_constructors_provided() {
+                assertThrows(
+                        IllegalComponentException.class,
+                        () -> context.bind(Component.class, ComponentWithMultiConstructorProvided.class)
+                );
+            }
         }
 
         @Nested
@@ -103,9 +111,21 @@ class ComponentWithInjectConstructor implements Component {
     public Dependency dependency() {
         return dependency;
     }
+
+}
+
+class ComponentWithMultiConstructorProvided implements Component {
+    @Inject
+    public ComponentWithMultiConstructorProvided(String name, Double value) {
+    }
+
+    @Inject
+    public ComponentWithMultiConstructorProvided(String name) {
+    }
 }
 
 class DependencyWithInjectConstructor implements Dependency {
+
     private final String dependency;
 
     @Inject
