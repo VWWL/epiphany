@@ -34,13 +34,13 @@ public class ExceptionsTest {
     void should_wrap_exception_for_functions_with_result() throws IOException {
         RuntimeException runtimeException = new RuntimeException();
         when(exceptions.evaluate()).thenThrow(runtimeException);
-        assertThatThrownBy(() -> Exceptions.evaluate(exceptions::evaluate).evaulate()).isInstanceOf(RuntimeException.class).isSameAs(runtimeException);
+        assertThatThrownBy(() -> Exceptions.evaluate(exceptions::evaluate).evaluate()).isInstanceOf(RuntimeException.class).isSameAs(runtimeException);
     }
 
     @Test
     void should_wrap_unchecked_exception_for_functions_with_result() throws IOException {
         when(exceptions.evaluate()).thenThrow(new IOException());
-        assertThatThrownBy(() -> Exceptions.evaluate(exceptions::evaluate).evaulate()).isInstanceOf(RuntimeException.class);
+        assertThatThrownBy(() -> Exceptions.evaluate(exceptions::evaluate).evaluate()).isInstanceOf(RuntimeException.class);
     }
 
     @Test
@@ -77,7 +77,7 @@ public class ExceptionsTest {
 
     @Test
     void should_be_able_to_evaluate_method_when_method_is_good() {
-        assertEquals(Exceptions.evaluate(() -> "test").evaulate(), "test");
+        assertEquals(Exceptions.evaluate(() -> "test").evaluate(), "test");
     }
 
     @SuppressWarnings("all")

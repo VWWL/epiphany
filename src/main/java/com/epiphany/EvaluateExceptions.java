@@ -7,7 +7,7 @@ public class EvaluateExceptions<R> implements Exceptions {
         this.supplier = supplier;
     }
 
-    public R evaulate() {
+    public R evaluate() {
         try {
             return supplier.get();
         } catch (Exception e) {
