@@ -24,7 +24,7 @@ public class Context {
 
     @SuppressWarnings("unchecked")
     public <Type> Type get(final Class<Type> type) {
-        if (!providers.containsKey(type)) throw new ComponentNotFoundException();
+        if (!providers.containsKey(type)) throw new DependencyNotFoundException();
         return (Type) providers.get(type).get();
     }
 
