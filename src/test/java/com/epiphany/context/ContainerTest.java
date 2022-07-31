@@ -124,10 +124,12 @@ public class ContainerTest {
                 context.bind(Component.class, ComponentWithInjectConstructor.class);
                 context.bind(Dependency.class, DependencyWithNestedDependency.class);
                 context.bind(NestedDependency.class, NestedDependencyOnComponent.class);
-                assertThrows(
+                CyclicDependenciesFoundException exception = assertThrows(
                         CyclicDependenciesFoundException.class,
                         () -> context.get(Component.class)
                 );
+                assertEquals(3, exception.components().size());
+                assertThat(exception.components()).containsExactly(Component.class, Dependency.class, NestedDependency.class);
             }
         }
 
