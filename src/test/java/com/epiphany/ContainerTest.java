@@ -29,7 +29,7 @@ public class ContainerTest {
         }
 
         @Test
-        void should_throw_() {
+        void should_return_empty_when_component_not_found() {
             Optional<Component> component = context.get(Component.class);
             assertEquals(Optional.empty(), component);
         }
@@ -101,6 +101,17 @@ public class ContainerTest {
                         () -> context.get(Component.class)
                 );
             }
+
+            @Test
+            void should_throw_if_three_cyclic_dependencies_found() {
+                context.bind(Component.class, ComponentWithInjectConstructor.class);
+                context.bind(Dependency.class, DependencyWithNestedDependency.class);
+                context.bind(NestedDependency.class, NestedDependencyOnComponent.class);
+                assertThrows(
+                        CyclicDependenciesFound.class,
+                        () -> context.get(Component.class)
+                );
+            }
         }
 
         @Nested
@@ -129,6 +140,9 @@ interface Component {
 }
 
 interface Dependency {
+}
+
+interface NestedDependency {
 }
 
 class ComponentWithDefaultConstructor implements Component {
@@ -180,8 +194,23 @@ class DependencyWithInjectConstructor implements Dependency {
     }
 }
 
+@SuppressWarnings("unused")
 class DependencyDependedOnComponent implements Dependency {
     @Inject
-    public DependencyDependedOnComponent(Component component) {
+    public DependencyDependedOnComponent(final Component component) {
+    }
+}
+
+@SuppressWarnings("unused")
+class DependencyWithNestedDependency implements Dependency {
+    @Inject
+    public DependencyWithNestedDependency(NestedDependency dependency) {
+    }
+}
+
+@SuppressWarnings("unused")
+class NestedDependencyOnComponent implements NestedDependency {
+    @Inject
+    public NestedDependencyOnComponent(final Component component) {
     }
 }
