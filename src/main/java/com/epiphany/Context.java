@@ -4,6 +4,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -30,13 +31,41 @@ public class Context {
 
     public <Type, Implementation extends Type> void bind(final Class<Type> type, final Class<Implementation> implementation) {
         check(implementation);
-        providers.put(type, () -> {
-            Constructor<Implementation> injectConstructor = injectConstructor(implementation);
-            Object[] dependencies = stream(injectConstructor.getParameters())
-                    .map(p -> get(p.getType()).orElseThrow(DependencyNotFoundException::new))
-                    .toArray(Object[]::new);
-            return evaluate(() -> injectConstructor.newInstance(dependencies)).evaluate();
-        });
+        providers.put(type, new ConstructorInjectionProvider<>(implementation));
+    }
+
+    class ConstructorInjectionProvider<Type> implements Provider<Type> {
+        private final Class<Type> implementation;
+        private boolean constructing;
+
+        public ConstructorInjectionProvider(Class<Type> implementation) {
+            this.implementation = implementation;
+        }
+
+        @Override
+        public Type get() {
+            if (constructing) throw new CyclicDependenciesFound();
+            try {
+                constructing();
+                Constructor<Type> injectConstructor = injectConstructor(implementation);
+                Object[] dependencies = stream(injectConstructor.getParameters())
+                        .map(p -> Context.this.get(p.getType()).orElseThrow(DependencyNotFoundException::new))
+                        .toArray(Object[]::new);
+                return injectConstructor.newInstance(dependencies);
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                throw new RuntimeException(e);
+            } finally {
+                constructed();
+            }
+        }
+
+        private void constructing() {
+            this.constructing = true;
+        }
+
+        private void constructed() {
+            this.constructing = false;
+        }
     }
 
     private <Type> void check(final Class<Type> implementation) {

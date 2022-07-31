@@ -168,7 +168,6 @@ class ComponentWithNoInjectAndDefaultConstructorProvided implements Component {
 }
 
 class DependencyWithInjectConstructor implements Dependency {
-
     private final String dependency;
 
     @Inject
@@ -182,14 +181,7 @@ class DependencyWithInjectConstructor implements Dependency {
 }
 
 class DependencyDependedOnComponent implements Dependency {
-    private final Component component;
-
     @Inject
     public DependencyDependedOnComponent(Component component) {
-        this.component = component;
-    }
-
-    public Component component() {
-        return component;
     }
 }
