@@ -1,12 +1,8 @@
 package com.epiphany;
 
 public interface Exceptions {
-    static void execute(RunnableWithCheckedException runnable) {
-        try {
-            runnable.run();
-        } catch (Exception e) {
-            throw wrap(e);
-        }
+    static RunnableExceptions execute(RunnableWithCheckedException runnable) {
+        return new RunnableExceptions(runnable);
     }
 
     static <R> R evaluate(SupplierWithCheckedException<R> supplier) {

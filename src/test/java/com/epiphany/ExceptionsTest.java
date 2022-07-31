@@ -21,13 +21,13 @@ public class ExceptionsTest {
     void should_wrap_exception_for_void_functions() throws IOException {
         RuntimeException runtimeException = new RuntimeException();
         doThrow(runtimeException).when(exceptions).execute();
-        assertThatThrownBy(() -> Exceptions.execute(exceptions::execute)).isInstanceOf(RuntimeException.class).isSameAs(runtimeException);
+        assertThatThrownBy(() -> Exceptions.execute(exceptions::execute).run()).isInstanceOf(RuntimeException.class).isSameAs(runtimeException);
     }
 
     @Test
     void should_wrap_unchecked_exception_for_void_functions() throws IOException {
         doThrow(new IOException()).when(exceptions).execute();
-        assertThatThrownBy(() -> Exceptions.execute(exceptions::execute)).isInstanceOf(RuntimeException.class);
+        assertThatThrownBy(() -> Exceptions.execute(exceptions::execute).run()).isInstanceOf(RuntimeException.class);
     }
 
     @Test
@@ -46,7 +46,7 @@ public class ExceptionsTest {
     @Test
     void should_be_able_to_execute_method_when_method_is_good() throws IOException {
         when(exceptions.evaluate()).thenReturn("");
-        Exceptions.execute(exceptions::execute);
+        Exceptions.execute(exceptions::execute).run();
         then(exceptions).should(only()).execute();
     }
 
