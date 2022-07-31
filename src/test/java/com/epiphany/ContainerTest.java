@@ -65,6 +65,14 @@ public class ContainerTest {
                         () -> context.bind(Component.class, ComponentWithMultiConstructorProvided.class)
                 );
             }
+
+            @Test
+            void should_throw_when_no_inject_or_default_constructor_provided() {
+                assertThrows(
+                        IllegalComponentException.class,
+                        () -> context.bind(Component.class, ComponentWithNoInjectAndDefaultConstructorProvided.class)
+                );
+            }
         }
 
         @Nested
@@ -122,6 +130,12 @@ class ComponentWithMultiConstructorProvided implements Component {
 
     @Inject
     public ComponentWithMultiConstructorProvided(final String name) {
+    }
+}
+
+@SuppressWarnings("unused")
+class ComponentWithNoInjectAndDefaultConstructorProvided implements Component {
+    public ComponentWithNoInjectAndDefaultConstructorProvided(final String name, final Double value) {
     }
 }
 

@@ -28,12 +28,25 @@ public class Context {
     }
 
     public <Type, Implementation extends Type> void bind(final Class<Type> type, final Class<Implementation> implementation) {
-        if (countOfInjectConstructors(implementation) > 1) throw new IllegalComponentException();
+        check(implementation);
         providers.put(type, () -> {
             Constructor<Implementation> injectConstructor = injectConstructor(implementation);
             Object[] dependencies = stream(injectConstructor.getParameters()).map(p -> this.get(p.getType())).toArray(Object[]::new);
             return evaluate(() -> injectConstructor.newInstance(dependencies)).evaluate();
         });
+    }
+
+    private <Type> void check(Class<Type> implementation) {
+        if (countOfInjectConstructors(implementation) > 1) throw new IllegalComponentException();
+        if (countOfInjectConstructors(implementation) == 0 && noDefaultConstructor(implementation)) throw new IllegalComponentException();
+    }
+
+    private <Type> boolean noDefaultConstructor(final Class<Type> implementation) {
+        return stream(implementation.getConstructors()).filter(this::noParams).findFirst().isEmpty();
+    }
+
+    private boolean noParams(final Constructor<?> constructor) {
+        return constructor.getParameters().length == 0;
     }
 
     private <Type> long countOfInjectConstructors(final Class<Type> implementation) {
