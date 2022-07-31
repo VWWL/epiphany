@@ -80,6 +80,7 @@ public class ExceptionsTest {
         assertEquals(Exceptions.evaluate(() -> "test"), "test");
     }
 
+    @SuppressWarnings("all")
     private interface TestForExceptions {
         void execute() throws IOException;
         String evaluate() throws IOException;
