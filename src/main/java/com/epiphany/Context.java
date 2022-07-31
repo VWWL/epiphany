@@ -36,7 +36,7 @@ public class Context {
     }
 
     @SuppressWarnings("unchecked")
-    private static <Type> Constructor<Type> injectConstructor(final Class<Type> implementation) {
+    private <Type> Constructor<Type> injectConstructor(final Class<Type> implementation) {
         Stream<Constructor<?>> injectConstructors = stream(implementation.getConstructors()).filter(c -> c.isAnnotationPresent(Inject.class));
         return (Constructor<Type>) injectConstructors.findFirst().orElseGet(() -> evaluate(implementation::getConstructor));
     }
