@@ -5,6 +5,7 @@ import jakarta.inject.Provider;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Parameter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -26,7 +27,7 @@ public class Context {
 
     public <Type, Implementation extends Type> void bind(final Class<Type> type, final Class<Implementation> implementation) {
         check(implementation);
-        providers.put(type, new ConstructorInjectionProvider<>(implementation));
+        providers.put(type, new ConstructorInjectionProvider<>(type, implementation));
     }
 
     @SuppressWarnings("unchecked")
@@ -58,10 +59,12 @@ public class Context {
     }
 
     class ConstructorInjectionProvider<Type> implements Provider<Type> {
+        private final Class<?> componentType;
         private final Class<Type> implementation;
         private boolean constructing;
 
-        public ConstructorInjectionProvider(Class<Type> implementation) {
+        public ConstructorInjectionProvider(final Class<?> componentType, final Class<Type> implementation) {
+            this.componentType = componentType;
             this.implementation = implementation;
         }
 
@@ -72,7 +75,8 @@ public class Context {
                 constructing();
                 Constructor<Type> injectConstructor = injectConstructor(implementation);
                 Object[] dependencies = stream(injectConstructor.getParameters())
-                        .map(p -> Context.this.get(p.getType()).orElseThrow(DependencyNotFoundException::new))
+                        .map(Parameter::getType)
+                        .map(type -> Context.this.get(type).orElseThrow(() -> new DependencyNotFoundException(type, componentType)))
                         .toArray(Object[]::new);
                 return injectConstructor.newInstance(dependencies);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {

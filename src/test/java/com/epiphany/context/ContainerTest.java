@@ -86,10 +86,24 @@ public class ContainerTest {
             @Test
             void should_throw_when_dependency_is_not_found() {
                 context.bind(Component.class, ComponentWithInjectConstructor.class);
-                assertThrows(
+                DependencyNotFoundException exception = assertThrows(
                         DependencyNotFoundException.class,
                         () -> context.get(Component.class).get()
                 );
+                assertEquals(Dependency.class, exception.dependency());
+                assertEquals(Component.class, exception.component());
+            }
+
+            @Test
+            void should_throw_if_transitive_dependency_not_found() {
+                context.bind(Component.class, ComponentWithInjectConstructor.class);
+                context.bind(Dependency.class, DependencyWithInjectConstructor.class);
+                DependencyNotFoundException exception = assertThrows(
+                        DependencyNotFoundException.class,
+                        () -> context.get(Component.class).get()
+                );
+                assertEquals(String.class, exception.dependency());
+                assertEquals(Dependency.class, exception.component());
             }
 
             @Test
