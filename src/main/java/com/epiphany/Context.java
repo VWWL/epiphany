@@ -36,7 +36,7 @@ public class Context {
         });
     }
 
-    private <Type> long countOfInjectConstructors(Class<Type> implementation) {
+    private <Type> long countOfInjectConstructors(final Class<Type> implementation) {
         return stream(implementation.getConstructors()).filter(c -> c.isAnnotationPresent(Inject.class)).count();
     }
 

@@ -104,7 +104,7 @@ class ComponentWithInjectConstructor implements Component {
     private final Dependency dependency;
 
     @Inject
-    public ComponentWithInjectConstructor(Dependency dependency) {
+    public ComponentWithInjectConstructor(final Dependency dependency) {
         this.dependency = dependency;
     }
 
@@ -117,11 +117,11 @@ class ComponentWithInjectConstructor implements Component {
 @SuppressWarnings("unused")
 class ComponentWithMultiConstructorProvided implements Component {
     @Inject
-    public ComponentWithMultiConstructorProvided(String name, Double value) {
+    public ComponentWithMultiConstructorProvided(final String name, final Double value) {
     }
 
     @Inject
-    public ComponentWithMultiConstructorProvided(String name) {
+    public ComponentWithMultiConstructorProvided(final String name) {
     }
 }
 
@@ -130,7 +130,7 @@ class DependencyWithInjectConstructor implements Dependency {
     private final String dependency;
 
     @Inject
-    public DependencyWithInjectConstructor(String dependency) {
+    public DependencyWithInjectConstructor(final String dependency) {
         this.dependency = dependency;
     }
 

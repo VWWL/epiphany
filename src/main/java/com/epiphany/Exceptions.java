@@ -9,14 +9,14 @@ public interface Exceptions {
         return new EvaluateExceptions<>(supplier);
     }
 
-    static void ignored(RunnableWithCheckedException runnable) {
+    static void ignored(final RunnableWithCheckedException runnable) {
         try {
             runnable.run();
         } catch (Exception ignored) {
         }
     }
 
-    static <R> R ignored(SupplierWithCheckedException<R> supplier, R defaultR) {
+    static <R> R ignored(final SupplierWithCheckedException<R> supplier, final R defaultR) {
         try {
             return supplier.get();
         } catch (Exception ignored) {
@@ -24,7 +24,7 @@ public interface Exceptions {
         }
     }
 
-    static RuntimeException wrap(Throwable throwable) {
+    static RuntimeException wrap(final Throwable throwable) {
         if (throwable instanceof RuntimeException) return (RuntimeException) throwable;
         return new RuntimeException(throwable);
     }

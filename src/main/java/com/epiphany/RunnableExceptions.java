@@ -3,7 +3,7 @@ package com.epiphany;
 public class RunnableExceptions implements Exceptions {
     private final RunnableWithCheckedException runnable;
 
-    public RunnableExceptions(RunnableWithCheckedException runnable) {
+    public RunnableExceptions(final RunnableWithCheckedException runnable) {
         this.runnable = runnable;
     }
 
@@ -15,7 +15,7 @@ public class RunnableExceptions implements Exceptions {
         }
     }
 
-    public void elseThrow(String message) {
+    public void elseThrow(final String message) {
         try {
             runnable.run();
         } catch (Exception e) {
