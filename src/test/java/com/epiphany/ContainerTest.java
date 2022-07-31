@@ -96,7 +96,7 @@ class ComponentWithInjectConstructor implements Component {
     private final Dependency dependency;
 
     @Inject
-    ComponentWithInjectConstructor(Dependency dependency) {
+    public ComponentWithInjectConstructor(Dependency dependency) {
         this.dependency = dependency;
     }
 
