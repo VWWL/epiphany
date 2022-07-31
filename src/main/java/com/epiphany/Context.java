@@ -24,14 +24,37 @@ public class Context {
         providers.put(type, () -> instance);
     }
 
-    @SuppressWarnings("unchecked")
-    public <Type> Optional<Type> get(final Class<Type> type) {
-        return (Optional<Type>) Optional.ofNullable(providers.get(type)).map(Provider::get);
-    }
-
     public <Type, Implementation extends Type> void bind(final Class<Type> type, final Class<Implementation> implementation) {
         check(implementation);
         providers.put(type, new ConstructorInjectionProvider<>(implementation));
+    }
+
+    @SuppressWarnings("unchecked")
+    public <Type> Optional<Type> get(final Class<Type> type) {
+        return Optional.ofNullable(providers.get(type)).map(Provider::get).map(o -> (Type) o);
+    }
+
+    private <Type> void check(final Class<Type> implementation) {
+        if (countOfInjectConstructors(implementation) > 1) throw new IllegalComponentException();
+        if (countOfInjectConstructors(implementation) == 0 && noDefaultConstructor(implementation)) throw new IllegalComponentException();
+    }
+
+    private <Type> boolean noDefaultConstructor(final Class<Type> implementation) {
+        return stream(implementation.getConstructors()).filter(this::noParams).findFirst().isEmpty();
+    }
+
+    private boolean noParams(final Constructor<?> constructor) {
+        return constructor.getParameters().length == 0;
+    }
+
+    private <Type> long countOfInjectConstructors(final Class<Type> implementation) {
+        return stream(implementation.getConstructors()).filter(c -> c.isAnnotationPresent(Inject.class)).count();
+    }
+
+    @SuppressWarnings("unchecked")
+    private <Type> Constructor<Type> injectConstructor(final Class<Type> implementation) {
+        Stream<Constructor<?>> injectConstructors = stream(implementation.getConstructors()).filter(c -> c.isAnnotationPresent(Inject.class));
+        return (Constructor<Type>) injectConstructors.findFirst().orElseGet(() -> evaluate(implementation::getConstructor).evaluate());
     }
 
     class ConstructorInjectionProvider<Type> implements Provider<Type> {
@@ -66,28 +89,5 @@ public class Context {
         private void constructed() {
             this.constructing = false;
         }
-    }
-
-    private <Type> void check(final Class<Type> implementation) {
-        if (countOfInjectConstructors(implementation) > 1) throw new IllegalComponentException();
-        if (countOfInjectConstructors(implementation) == 0 && noDefaultConstructor(implementation)) throw new IllegalComponentException();
-    }
-
-    private <Type> boolean noDefaultConstructor(final Class<Type> implementation) {
-        return stream(implementation.getConstructors()).filter(this::noParams).findFirst().isEmpty();
-    }
-
-    private boolean noParams(final Constructor<?> constructor) {
-        return constructor.getParameters().length == 0;
-    }
-
-    private <Type> long countOfInjectConstructors(final Class<Type> implementation) {
-        return stream(implementation.getConstructors()).filter(c -> c.isAnnotationPresent(Inject.class)).count();
-    }
-
-    @SuppressWarnings("unchecked")
-    private <Type> Constructor<Type> injectConstructor(final Class<Type> implementation) {
-        Stream<Constructor<?>> injectConstructors = stream(implementation.getConstructors()).filter(c -> c.isAnnotationPresent(Inject.class));
-        return (Constructor<Type>) injectConstructors.findFirst().orElseGet(() -> evaluate(implementation::getConstructor).evaluate());
     }
 }
