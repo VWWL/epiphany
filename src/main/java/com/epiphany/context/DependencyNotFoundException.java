@@ -1,4 +1,4 @@
-package com.epiphany;
+package com.epiphany.context;
 
 public class DependencyNotFoundException extends RuntimeException {
     public DependencyNotFoundException() {

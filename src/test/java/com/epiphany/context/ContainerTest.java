@@ -1,4 +1,4 @@
-package com.epiphany;
+package com.epiphany.context;
 
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;

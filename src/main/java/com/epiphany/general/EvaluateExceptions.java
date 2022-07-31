@@ -1,4 +1,4 @@
-package com.epiphany;
+package com.epiphany.general;
 
 public class EvaluateExceptions<R> implements Exceptions {
     private final SupplierWithCheckedException<R> supplier;

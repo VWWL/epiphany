@@ -1,4 +1,4 @@
-package com.epiphany;
+package com.epiphany.context;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static com.epiphany.Exceptions.evaluate;
+import static com.epiphany.general.Exceptions.evaluate;
 import static java.util.Arrays.stream;
 
 public class Context {

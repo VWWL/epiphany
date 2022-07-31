@@ -1,4 +1,4 @@
-package com.epiphany;
+package com.epiphany.general;
 
 public class RunnableExceptions implements Exceptions {
     private final RunnableWithCheckedException runnable;

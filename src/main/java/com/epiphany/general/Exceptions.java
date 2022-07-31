@@ -1,4 +1,4 @@
-package com.epiphany;
+package com.epiphany.general;
 
 public interface Exceptions {
     static RunnableExceptions execute(RunnableWithCheckedException runnable) {

@@ -1,4 +1,4 @@
-package com.epiphany;
+package com.epiphany.general;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;

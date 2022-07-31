@@ -1,4 +1,4 @@
-package com.epiphany;
+package com.epiphany.general;
 
 @FunctionalInterface
 public interface RunnableWithCheckedException {
