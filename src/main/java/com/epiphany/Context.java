@@ -6,6 +6,7 @@ import jakarta.inject.Provider;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static com.epiphany.Exceptions.evaluate;
@@ -23,21 +24,22 @@ public class Context {
     }
 
     @SuppressWarnings("unchecked")
-    public <Type> Type get(final Class<Type> type) {
-        if (!providers.containsKey(type)) throw new DependencyNotFoundException();
-        return (Type) providers.get(type).get();
+    public <Type> Optional<Type> get(final Class<Type> type) {
+        return (Optional<Type>) Optional.ofNullable(providers.get(type)).map(Provider::get);
     }
 
     public <Type, Implementation extends Type> void bind(final Class<Type> type, final Class<Implementation> implementation) {
         check(implementation);
         providers.put(type, () -> {
             Constructor<Implementation> injectConstructor = injectConstructor(implementation);
-            Object[] dependencies = stream(injectConstructor.getParameters()).map(p -> this.get(p.getType())).toArray(Object[]::new);
+            Object[] dependencies = stream(injectConstructor.getParameters())
+                    .map(p -> get(p.getType()).orElseThrow(DependencyNotFoundException::new))
+                    .toArray(Object[]::new);
             return evaluate(() -> injectConstructor.newInstance(dependencies)).evaluate();
         });
     }
 
-    private <Type> void check(Class<Type> implementation) {
+    private <Type> void check(final Class<Type> implementation) {
         if (countOfInjectConstructors(implementation) > 1) throw new IllegalComponentException();
         if (countOfInjectConstructors(implementation) == 0 && noDefaultConstructor(implementation)) throw new IllegalComponentException();
     }

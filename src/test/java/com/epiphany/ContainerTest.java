@@ -5,8 +5,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 
+@SuppressWarnings("all")
 public class ContainerTest {
     private Context context;
 
@@ -22,7 +25,13 @@ public class ContainerTest {
             Component instance = new Component() {
             };
             context.bind(Component.class, instance);
-            assertSame(instance, context.get(Component.class));
+            assertSame(instance, context.get(Component.class).get());
+        }
+
+        @Test
+        void should_throw_() {
+            Optional<Component> component = context.get(Component.class);
+            assertEquals(Optional.empty(), component);
         }
 
         @Nested
@@ -30,7 +39,7 @@ public class ContainerTest {
             @Test
             void should_bind_class_to_a_default_constructor() {
                 context.bind(Component.class, ComponentWithDefaultConstructor.class);
-                Component instance = context.get(Component.class);
+                Component instance = context.get(Component.class).get();
                 assertNotNull(instance);
                 assertTrue(instance instanceof ComponentWithDefaultConstructor);
             }
@@ -41,7 +50,7 @@ public class ContainerTest {
                 };
                 context.bind(Component.class, ComponentWithInjectConstructor.class);
                 context.bind(Dependency.class, dependency);
-                Component instance = context.get(Component.class);
+                Component instance = context.get(Component.class).get();
                 assertNotNull(instance);
                 assertSame(dependency, ((ComponentWithInjectConstructor) instance).dependency());
             }
@@ -51,7 +60,7 @@ public class ContainerTest {
                 context.bind(Component.class, ComponentWithInjectConstructor.class);
                 context.bind(Dependency.class, DependencyWithInjectConstructor.class);
                 context.bind(String.class, "Indirect dependency");
-                Component instance = context.get(Component.class);
+                Component instance = context.get(Component.class).get();
                 assertNotNull(instance);
                 Dependency dependency = ((ComponentWithInjectConstructor) instance).dependency();
                 assertNotNull(dependency);
@@ -79,7 +88,7 @@ public class ContainerTest {
                 context.bind(Component.class, ComponentWithInjectConstructor.class);
                 assertThrows(
                         DependencyNotFoundException.class,
-                        () -> context.get(Component.class)
+                        () -> context.get(Component.class).get()
                 );
             }
         }
