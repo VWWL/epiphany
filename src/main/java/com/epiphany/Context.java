@@ -23,6 +23,6 @@ public class Context {
 
     public <ComponentType, ComponentImplementation extends ComponentType>
     void bind(final Class<ComponentType> type, final Class<ComponentImplementation> implementationType) {
-
+        providers.put(type, () -> Exceptions.evaluate(() -> implementationType.getConstructor().newInstance()));
     }
 }

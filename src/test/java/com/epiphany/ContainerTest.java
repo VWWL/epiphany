@@ -10,6 +10,8 @@ public class ContainerTest {
     }
 
     static class ComponentWithDefaultConstructor implements Component {
+        public ComponentWithDefaultConstructor() {
+        }
     }
 
     @Nested
