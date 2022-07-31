@@ -12,17 +12,16 @@ public class Context {
         this.providers = new HashMap<>();
     }
 
-    public <ComponentType> void bind(final Class<ComponentType> type, final ComponentType instance) {
+    public <Type> void bind(final Class<Type> type, final Type instance) {
         providers.put(type, () -> instance);
     }
 
     @SuppressWarnings("unchecked")
-    public <ComponentType> ComponentType get(final Class<ComponentType> type) {
-        return (ComponentType) providers.get(type).get();
+    public <Type> Type get(final Class<Type> type) {
+        return (Type) providers.get(type).get();
     }
 
-    public <ComponentType, ComponentImplementationType extends ComponentType>
-    void bind(final Class<ComponentType> type, final Class<ComponentImplementationType> implementationType) {
+    public <Type, Implementation extends Type> void bind(final Class<Type> type, final Class<Implementation> implementationType) {
         providers.put(type, () -> Exceptions.evaluate(() -> implementationType.getConstructor().newInstance()));
     }
 }
