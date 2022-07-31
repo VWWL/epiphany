@@ -5,12 +5,8 @@ public interface Exceptions {
         return new RunnableExceptions(runnable);
     }
 
-    static <R> R evaluate(SupplierWithCheckedException<R> supplier) {
-        try {
-            return supplier.get();
-        } catch (Exception e) {
-            throw wrap(e);
-        }
+    static <R> EvaluateExceptions<R> evaluate(SupplierWithCheckedException<R> supplier) {
+        return new EvaluateExceptions<>(supplier);
     }
 
     static void ignored(RunnableWithCheckedException runnable) {
