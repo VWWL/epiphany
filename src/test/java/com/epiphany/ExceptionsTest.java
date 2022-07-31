@@ -51,6 +51,18 @@ public class ExceptionsTest {
     }
 
     @Test
+    void should_execute_exception_for_wanted_message() throws IOException {
+        doThrow(new IOException()).when(exceptions).execute();
+        assertThatThrownBy(() -> Exceptions.execute(exceptions::execute).elseThrow("message"))
+                .isInstanceOf(RuntimeException.class).hasMessage("message");
+    }
+
+    @Test
+    void should_execute_exception_when_method_is_good() {
+        assertDoesNotThrow(() -> Exceptions.execute(exceptions::execute).elseThrow("message"));
+    }
+
+    @Test
     void should_execute_method_when_method_is_good() throws IOException {
         when(exceptions.evaluate()).thenReturn("");
         Exceptions.ignored(exceptions::execute);
@@ -62,6 +74,19 @@ public class ExceptionsTest {
         doThrow(new RuntimeException()).when(exceptions).execute();
         assertDoesNotThrow(() -> Exceptions.ignored(exceptions::execute));
     }
+
+    @Test
+    void should_evaluate_exception_for_wanted_message() throws IOException {
+        doThrow(new IOException()).when(exceptions).evaluate();
+        assertThatThrownBy(() -> Exceptions.evaluate(exceptions::evaluate).elseThrow("message"))
+                .isInstanceOf(RuntimeException.class).hasMessage("message");
+    }
+
+    @Test
+    void should_evaluate_exception_when_method_is_good() {
+        assertDoesNotThrow(() -> Exceptions.evaluate(exceptions::evaluate).elseThrow("message"));
+    }
+
 
     @Test
     void should_evaluate_ignored_method_when_method_is_good() throws IOException {

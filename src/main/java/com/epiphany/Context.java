@@ -31,7 +31,7 @@ public class Context {
         providers.put(type, () -> {
             Constructor<Implementation> injectConstructor = injectConstructor(implementation);
             Object[] dependencies = stream(injectConstructor.getParameters()).map(p -> this.get(p.getType())).toArray(Object[]::new);
-            return evaluate(() -> injectConstructor.newInstance(dependencies));
+            return evaluate(() -> injectConstructor.newInstance(dependencies)).evaluate();
         });
     }
 

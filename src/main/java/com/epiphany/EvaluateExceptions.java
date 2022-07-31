@@ -14,4 +14,12 @@ public class EvaluateExceptions<R> implements Exceptions {
             throw Exceptions.wrap(e);
         }
     }
+
+    public R elseThrow(String message) {
+        try {
+            return supplier.get();
+        } catch (Exception e) {
+            throw new RuntimeException(message);
+        }
+    }
 }

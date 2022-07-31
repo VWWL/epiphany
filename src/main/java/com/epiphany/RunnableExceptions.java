@@ -14,4 +14,12 @@ public class RunnableExceptions implements Exceptions {
             throw Exceptions.wrap(e);
         }
     }
+
+    public void elseThrow(String message) {
+        try {
+            runnable.run();
+        } catch (Exception e) {
+            throw new RuntimeException(message);
+        }
+    }
 }
