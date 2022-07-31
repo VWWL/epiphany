@@ -3,6 +3,11 @@
     <words>
       <w>COVEREDRATIO</w>
       <w>temurin</w>
+      <w>setlocal</w>
+      <w>ERRORLEVEL</w>
+      <w>Dorg</w>
+      <w>appname</w>
+      <w>endlocal</w>
     </words>
   </dictionary>
 </component>
