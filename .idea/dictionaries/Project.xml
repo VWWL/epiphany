@@ -2,12 +2,12 @@
   <dictionary name="Project">
     <words>
       <w>COVEREDRATIO</w>
-      <w>temurin</w>
-      <w>setlocal</w>
-      <w>ERRORLEVEL</w>
       <w>Dorg</w>
+      <w>ERRORLEVEL</w>
       <w>appname</w>
       <w>endlocal</w>
+      <w>setlocal</w>
+      <w>temurin</w>
     </words>
   </dictionary>
 </component>
