@@ -21,8 +21,8 @@ public class Context {
         return (ComponentType) providers.get(type).get();
     }
 
-    public <ComponentType, ComponentImplementation extends ComponentType>
-    void bind(final Class<ComponentType> type, final Class<ComponentImplementation> implementationType) {
+    public <ComponentType, ComponentImplementationType extends ComponentType>
+    void bind(final Class<ComponentType> type, final Class<ComponentImplementationType> implementationType) {
         providers.put(type, () -> Exceptions.evaluate(() -> implementationType.getConstructor().newInstance()));
     }
 }
