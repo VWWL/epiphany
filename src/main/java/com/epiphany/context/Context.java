@@ -4,7 +4,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.util.HashMap;
 import java.util.Map;
@@ -73,20 +72,21 @@ public class Context {
             if (constructing) throw new CyclicDependenciesFoundException(componentType);
             try {
                 constructing();
-                Constructor<Type> injectConstructor = injectConstructor(implementation);
-                Object[] dependencies = stream(injectConstructor.getParameters())
-                        .map(Parameter::getType)
-                        .map(type -> Context.this.get(type).orElseThrow(() -> new DependencyNotFoundException(type, componentType)))
-                        .toArray(Object[]::new);
-                return injectConstructor.newInstance(dependencies);
+                return createInstanceByInjectOrDefaultConstructor();
             } catch (CyclicDependenciesFoundException e) {
                 throw new CyclicDependenciesFoundException(componentType, e);
-            }
-            catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                throw new RuntimeException(e);
             } finally {
                 constructed();
             }
+        }
+
+        private Type createInstanceByInjectOrDefaultConstructor() {
+            Constructor<Type> injectConstructor = injectConstructor(implementation);
+            Object[] dependencies = stream(injectConstructor.getParameters())
+                    .map(Parameter::getType)
+                    .map(type -> Context.this.get(type).orElseThrow(() -> new DependencyNotFoundException(type, componentType)))
+                    .toArray(Object[]::new);
+            return evaluate(() -> injectConstructor.newInstance(dependencies)).evaluate();
         }
 
         private void constructing() {
