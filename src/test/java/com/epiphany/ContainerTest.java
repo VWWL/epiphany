@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ContainerTest {
-    Context context;
+    private Context context;
 
     @BeforeEach
     void setUp() {
@@ -17,7 +17,6 @@ public class ContainerTest {
 
     @Nested
     public class ComponentConstruction {
-
         @Test
         void should_bind_type_to_a_specific_instance() {
             Component instance = new Component() {
