@@ -70,7 +70,7 @@ public class Context {
 
         @Override
         public Type get() {
-            if (constructing) throw new CyclicDependenciesFound();
+            if (constructing) throw new CyclicDependenciesFoundException(componentType);
             try {
                 constructing();
                 Constructor<Type> injectConstructor = injectConstructor(implementation);
@@ -79,7 +79,10 @@ public class Context {
                         .map(type -> Context.this.get(type).orElseThrow(() -> new DependencyNotFoundException(type, componentType)))
                         .toArray(Object[]::new);
                 return injectConstructor.newInstance(dependencies);
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            } catch (CyclicDependenciesFoundException e) {
+                throw new CyclicDependenciesFoundException(componentType, e);
+            }
+            catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);
             } finally {
                 constructed();

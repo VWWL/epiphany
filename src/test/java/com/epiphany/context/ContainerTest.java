@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("all")
@@ -110,10 +111,12 @@ public class ContainerTest {
             void should_throw_if_cyclic_dependencies_found() {
                 context.bind(Component.class, ComponentWithInjectConstructor.class);
                 context.bind(Dependency.class, DependencyDependedOnComponent.class);
-                assertThrows(
-                        CyclicDependenciesFound.class,
+                CyclicDependenciesFoundException exception = assertThrows(
+                        CyclicDependenciesFoundException.class,
                         () -> context.get(Component.class)
                 );
+                assertEquals(2, exception.components().size());
+                assertThat(exception.components()).containsExactly(Component.class, Dependency.class);
             }
 
             @Test
@@ -122,7 +125,7 @@ public class ContainerTest {
                 context.bind(Dependency.class, DependencyWithNestedDependency.class);
                 context.bind(NestedDependency.class, NestedDependencyOnComponent.class);
                 assertThrows(
-                        CyclicDependenciesFound.class,
+                        CyclicDependenciesFoundException.class,
                         () -> context.get(Component.class)
                 );
             }
