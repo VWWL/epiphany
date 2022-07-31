@@ -114,6 +114,7 @@ class ComponentWithInjectConstructor implements Component {
 
 }
 
+@SuppressWarnings("unused")
 class ComponentWithMultiConstructorProvided implements Component {
     @Inject
     public ComponentWithMultiConstructorProvided(String name, Double value) {
