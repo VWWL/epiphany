@@ -4,6 +4,7 @@ import jakarta.inject.Inject;
 
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.stream.*;
 
 import static com.epiphany.general.Exceptions.evaluate;
@@ -75,28 +76,16 @@ public final class InjectionProvider<Type> implements Provider<Type> {
     }
 
     private static <Type> List<Field> initInjectFields(Class<Type> component) {
-        List<Field> injectFields = new ArrayList<>();
-        Class<?> current = component;
-        while (current != Object.class) {
-            injectFields.addAll(injectableStream(current.getDeclaredFields()).toList());
-            current = current.getSuperclass();
-        }
-        return injectFields;
+        return traverse(component, (injectMethods1, current) -> injectableStream(current.getDeclaredFields()).toList());
     }
 
     private static <Type> List<Method> initInjectMethods(Class<Type> component) {
-        List<Method> injectMethods = new ArrayList<>();
-        Class<?> current = component;
-        while (current != Object.class) {
-            List<Method> currentInjectMethods = injectableStream(current.getDeclaredMethods())
-                .filter(o -> isOverrideByInjectMethod(injectMethods, o))
-                .filter(o -> isOverrideByNoInjectMethod(component, o))
-                .toList();
-            injectMethods.addAll(currentInjectMethods);
-            current = current.getSuperclass();
-        }
-        Collections.reverse(injectMethods);
-        return injectMethods;
+        List<Method> methods = traverse(component, (methods1, current) -> injectableStream(current.getDeclaredMethods())
+            .filter(o -> isOverrideByInjectMethod(methods1, o))
+            .filter(o -> isOverrideByNoInjectMethod(component, o))
+            .toList());
+        Collections.reverse(methods);
+        return methods;
     }
 
     private static <Type> boolean isOverrideByNoInjectMethod(Class<Type> component, Method method) {
@@ -120,6 +109,16 @@ public final class InjectionProvider<Type> implements Provider<Type> {
     @SuppressWarnings("all")
     public static Object[] toDependencies(Context context, Executable executable) {
         return stream(executable.getParameters()).map(Parameter::getType).map(context::get).map(Optional::get).toArray(Object[]::new);
+    }
+
+    private static <T> List<T> traverse(Class<?> component, BiFunction<List<T>, Class<?>, List<T>> finder) {
+        List<T> members = new ArrayList<>();
+        Class<?> current = component;
+        while (current != Object.class) {
+            members.addAll(finder.apply(members, current));
+            current = current.getSuperclass();
+        }
+        return members;
     }
 
     private static boolean isOverride(Method first, Method another) {
