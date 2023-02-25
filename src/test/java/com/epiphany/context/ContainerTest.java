@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("all")
 public class ContainerTest {
+
     private ContextConfig config;
 
     @BeforeEach
@@ -21,6 +22,7 @@ public class ContainerTest {
 
     @Nested
     public class ComponentConstruction {
+
         @Test
         void should_bind_type_to_a_specific_instance() {
             Component instance = new Component() {
@@ -37,6 +39,7 @@ public class ContainerTest {
 
         @Nested
         public class ConstructorInjection {
+
             @Test
             void should_bind_class_to_a_default_constructor() {
                 config.bind(Component.class, ComponentWithDefaultConstructor.class);
@@ -99,9 +102,9 @@ public class ContainerTest {
             void should_throw_if_cyclic_dependencies_found() {
                 config.bind(Component.class, ComponentWithInjectConstructor.class);
                 config.bind(Dependency.class, DependencyDependedOnComponent.class);
-                CyclicDependenciesFoundException exception = assertThrows(CyclicDependenciesFoundException.class, () -> config.context().get(Component.class));
+                CyclicDependenciesFoundException exception = assertThrows(CyclicDependenciesFoundException.class, () -> config.context());
                 assertEquals(2, exception.components().size());
-                assertThat(exception.components()).containsExactly(Component.class, Dependency.class);
+                assertThat(exception.components()).containsExactlyInAnyOrder(Dependency.class, Component.class);
             }
 
             @Test
@@ -109,10 +112,11 @@ public class ContainerTest {
                 config.bind(Component.class, ComponentWithInjectConstructor.class);
                 config.bind(Dependency.class, DependencyWithNestedDependency.class);
                 config.bind(NestedDependency.class, NestedDependencyOnComponent.class);
-                CyclicDependenciesFoundException exception = assertThrows(CyclicDependenciesFoundException.class, () -> config.context().get(Component.class));
+                CyclicDependenciesFoundException exception = assertThrows(CyclicDependenciesFoundException.class, () -> config.context());
                 assertEquals(3, exception.components().size());
-                assertThat(exception.components()).containsExactly(Component.class, Dependency.class, NestedDependency.class);
+                assertThat(exception.components()).containsExactlyInAnyOrder(Component.class, Dependency.class, NestedDependency.class);
             }
+
         }
 
         @Nested
@@ -124,6 +128,7 @@ public class ContainerTest {
         public class MethodInjection {
 
         }
+
     }
 
     @Nested
@@ -135,6 +140,7 @@ public class ContainerTest {
     public class LifecycleManagement {
 
     }
+
 }
 
 interface Component {
@@ -147,11 +153,14 @@ interface NestedDependency {
 }
 
 class ComponentWithDefaultConstructor implements Component {
+
     public ComponentWithDefaultConstructor() {
     }
+
 }
 
 class ComponentWithInjectConstructor implements Component {
+
     private final Dependency dependency;
 
     @Inject
@@ -167,6 +176,7 @@ class ComponentWithInjectConstructor implements Component {
 
 @SuppressWarnings("unused")
 class ComponentWithMultiConstructorProvided implements Component {
+
     @Inject
     public ComponentWithMultiConstructorProvided(final String name, final Double value) {
     }
@@ -174,15 +184,19 @@ class ComponentWithMultiConstructorProvided implements Component {
     @Inject
     public ComponentWithMultiConstructorProvided(final String name) {
     }
+
 }
 
 @SuppressWarnings("unused")
 class ComponentWithNoInjectAndDefaultConstructorProvided implements Component {
+
     public ComponentWithNoInjectAndDefaultConstructorProvided(final String name, final Double value) {
     }
+
 }
 
 class DependencyWithInjectConstructor implements Dependency {
+
     private final String dependency;
 
     @Inject
@@ -193,25 +207,32 @@ class DependencyWithInjectConstructor implements Dependency {
     public String dependency() {
         return dependency;
     }
+
 }
 
 @SuppressWarnings("unused")
 class DependencyDependedOnComponent implements Dependency {
+
     @Inject
     public DependencyDependedOnComponent(final Component component) {
     }
+
 }
 
 @SuppressWarnings("unused")
 class DependencyWithNestedDependency implements Dependency {
+
     @Inject
     public DependencyWithNestedDependency(NestedDependency dependency) {
     }
+
 }
 
 @SuppressWarnings("unused")
 class NestedDependencyOnComponent implements NestedDependency {
+
     @Inject
     public NestedDependencyOnComponent(final Component component) {
     }
+
 }

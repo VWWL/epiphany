@@ -8,26 +8,15 @@ import static java.util.Arrays.stream;
 
 class ConstructorInjectionProvider<Type> implements Provider<Type> {
 
-    private final Class<?> componentType;
     private final Constructor<Type> injectConstructor;
-    private boolean constructing;
 
-    public ConstructorInjectionProvider(final Class<?> componentType, Constructor<Type> injectConstructor) {
-        this.componentType = componentType;
+    public ConstructorInjectionProvider(Constructor<Type> injectConstructor) {
         this.injectConstructor = injectConstructor;
     }
 
     @Override
     public Type get(Context context) {
-        if (constructing) throw new CyclicDependenciesFoundException(componentType);
-        try {
-            constructing();
-            return createInstanceByInjectOrDefaultConstructor(context);
-        } catch (CyclicDependenciesFoundException e) {
-            throw new CyclicDependenciesFoundException(componentType, e);
-        } finally {
-            constructed();
-        }
+        return createInstanceByInjectOrDefaultConstructor(context);
     }
 
     private Type createInstanceByInjectOrDefaultConstructor(Context context) {
@@ -38,14 +27,6 @@ class ConstructorInjectionProvider<Type> implements Provider<Type> {
             .map(Optional::get)
             .toArray(Object[]::new);
         return evaluate(() -> injectConstructor.newInstance(dependencies)).evaluate();
-    }
-
-    private void constructing() {
-        this.constructing = true;
-    }
-
-    private void constructed() {
-        this.constructing = false;
     }
 
 }
