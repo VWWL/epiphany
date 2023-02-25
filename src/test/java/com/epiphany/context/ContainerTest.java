@@ -2,8 +2,11 @@ package com.epiphany.context;
 
 import com.epiphany.context.source.*;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.*;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,6 +32,23 @@ public class ContainerTest {
                 Component instance = new Component() {};
                 config.bind(Component.class, instance);
                 assertSame(instance, config.context().get(Component.class).get());
+            }
+
+            @ParameterizedTest(name = "supporting {0}")
+            @MethodSource
+            void should_bind_type_to_an_injectable_component(Class<? extends Something> componentType) {
+                Dependency dependency = new Dependency() {};
+                config.bind(Dependency.class, dependency);
+                config.bind(Something.class, componentType);
+                Optional<Something> something = config.context().get(Something.class);
+                assertTrue(something.isPresent());
+                assertSame(dependency, something.get().dependency());
+            }
+
+            public static Stream<Arguments> should_bind_type_to_an_injectable_component() {
+                return Stream.of(
+                    Arguments.of(Named.of("Constructor Injection", ConstructorInjection.class))
+                );
             }
 
             @Test
