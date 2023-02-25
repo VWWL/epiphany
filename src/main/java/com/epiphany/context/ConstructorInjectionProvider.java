@@ -63,16 +63,23 @@ public final class ConstructorInjectionProvider<Type> implements Provider<Type> 
         return injectFields;
     }
 
+    private static <Type> List<Method> initInjectMethods(Class<Type> component) {
+        List<Method> injectMethods = new ArrayList<>();
+        Class<?> current = component;
+        while (current != Object.class) {
+            injectMethods.addAll(stream(current.getDeclaredMethods()).filter(o -> o.isAnnotationPresent(Inject.class)).toList());
+            current = current.getSuperclass();
+        }
+        Collections.reverse(injectMethods);
+        return injectMethods;
+    }
+
     @SuppressWarnings("unchecked")
     private static <Type> Constructor<Type> initInjectConstructor(Class<Type> component) {
         return (Constructor<Type>) stream(component.getConstructors())
             .filter(c -> c.isAnnotationPresent(Inject.class))
             .findFirst()
             .orElseGet(() -> evaluate(component::getDeclaredConstructor).evaluate());
-    }
-
-    private static <Type> List<Method> initInjectMethods(Class<Type> component) {
-        return stream(component.getDeclaredMethods()).filter(o -> o.isAnnotationPresent(Inject.class)).collect(Collectors.toList());
     }
 
 }

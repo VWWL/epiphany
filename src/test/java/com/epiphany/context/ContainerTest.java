@@ -175,6 +175,24 @@ public class ContainerTest {
                 assertThat(provider.dependencies()).containsExactly(Dependency.class);
             }
 
+            @Test
+            void should_inject_subclass_dependency_and_superclass_dependency() {
+                Dependency dependency = new Dependency() {};
+                Component componentInstance = new Component() {};
+                config.bind(Dependency.class, dependency);
+                config.bind(Component.class, componentInstance);
+                config.bind(SubClassWithInjectMethod.class, SubClassWithInjectMethod.class);
+                SubClassWithInjectMethod component = config.context().get(SubClassWithInjectMethod.class).get();
+                assertSame(componentInstance, component.component());
+                assertSame(dependency, component.dependency());
+            }
+
+            @Test
+            void inclue_dependencies_from_inject_method_and_super_class_inject_method_and_called_super_first() {
+                ConstructorInjectionProvider<SubClassWithInjectMethod> provider = new ConstructorInjectionProvider<>(SubClassWithInjectMethod.class);
+                assertThat(provider.dependencies()).containsExactly(Dependency.class, Component.class);
+            }
+
         }
 
     }
@@ -196,6 +214,38 @@ interface Component {}
 interface Dependency {}
 
 interface NestedDependency {}
+
+@SuppressWarnings("unused")
+class SuperClassWithInjectMethod {
+
+    private Dependency dependency;
+
+    @Inject
+    private void injectDependency(Dependency dependency) {
+        this.dependency = dependency;
+    }
+
+    public Dependency dependency() {
+        return dependency;
+    }
+
+}
+
+@SuppressWarnings("unused")
+class SubClassWithInjectMethod extends SuperClassWithInjectMethod {
+
+    private Component component;
+
+    @Inject
+    private void injectComponent(Component component) {
+        this.component = component;
+    }
+
+    public Component component() {
+        return component;
+    }
+
+}
 
 @SuppressWarnings("unused")
 class MethodInjectionWithNoDependency {
