@@ -48,7 +48,8 @@ public class ContainerTest {
             public static Stream<Arguments> should_bind_type_to_an_injectable_component() {
                 return Stream.of(
                     Arguments.of(Named.of("Constructor Injection", ConstructorInjection.class)),
-                    Arguments.of(Named.of("Field Injection", FieldInjection.class))
+                    Arguments.of(Named.of("Field Injection", FieldInjection.class)),
+                    Arguments.of(Named.of("Method Injection", MethodInjection.class))
                 );
             }
 
