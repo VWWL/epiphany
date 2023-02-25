@@ -8,13 +8,13 @@ import org.mockito.quality.Strictness;
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class ExceptionsTest {
+
     private @Mock TestForExceptions exceptions;
 
     @Test
@@ -54,7 +54,7 @@ public class ExceptionsTest {
     void should_execute_exception_for_wanted_message() throws IOException {
         doThrow(new IOException()).when(exceptions).execute();
         assertThatThrownBy(() -> Exceptions.execute(exceptions::execute).elseThrow("message"))
-                .isInstanceOf(RuntimeException.class).hasMessage("message");
+            .isInstanceOf(RuntimeException.class).hasMessage("message");
     }
 
     @Test
@@ -79,14 +79,13 @@ public class ExceptionsTest {
     void should_evaluate_exception_for_wanted_message() throws IOException {
         doThrow(new IOException()).when(exceptions).evaluate();
         assertThatThrownBy(() -> Exceptions.evaluate(exceptions::evaluate).elseThrow("message"))
-                .isInstanceOf(RuntimeException.class).hasMessage("message");
+            .isInstanceOf(RuntimeException.class).hasMessage("message");
     }
 
     @Test
     void should_evaluate_exception_when_method_is_good() {
         assertDoesNotThrow(() -> Exceptions.evaluate(exceptions::evaluate).elseThrow("message"));
     }
-
 
     @Test
     void should_evaluate_ignored_method_when_method_is_good() throws IOException {
@@ -107,7 +106,11 @@ public class ExceptionsTest {
 
     @SuppressWarnings("all")
     private interface TestForExceptions {
+
         void execute() throws IOException;
+
         String evaluate() throws IOException;
+
     }
+
 }

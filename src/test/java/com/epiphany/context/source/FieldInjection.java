@@ -1,7 +1,8 @@
 package com.epiphany.context.source;
 
-import jakarta.inject.Inject;
+import com.epiphany.context.Inject;
 
+@SuppressWarnings("unused")
 public class FieldInjection implements Something {
 
     private @Inject Dependency dependency;

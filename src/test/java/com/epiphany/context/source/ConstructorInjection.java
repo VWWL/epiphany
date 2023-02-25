@@ -1,6 +1,6 @@
 package com.epiphany.context.source;
 
-import jakarta.inject.Inject;
+import com.epiphany.context.Inject;
 
 public class ConstructorInjection implements Something {
 
