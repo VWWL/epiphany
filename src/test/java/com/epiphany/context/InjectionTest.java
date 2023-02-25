@@ -1,23 +1,28 @@
 package com.epiphany.context;
 
 import org.junit.jupiter.api.*;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @SuppressWarnings("all")
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class InjectionTest {
 
-    private ContextConfig config;
-    private Dependency dependency;
+    private @Mock Dependency dependency;
+    private @Mock Component componentInstance;
+    private @Mock Context context;
 
     @BeforeEach
     void setUp() {
-        this.config = new ContextConfig();
-        this.dependency = new Dependency() {};
-        config.bind(Dependency.class, dependency);
+        when(context.get(Dependency.class)).thenReturn(Optional.of(dependency));
+        when(context.get(Component.class)).thenReturn(Optional.of(componentInstance));
     }
 
     @Nested
@@ -39,8 +44,7 @@ public class InjectionTest {
 
         @Test
         void should_bind_type_to_a_class_with_transitive_dependencies() {
-            config.bind(Dependency.class, DependencyWithInjectConstructor.class);
-            config.bind(String.class, "Indirect dependency");
+            when(context.get(Dependency.class)).thenReturn(Optional.of(new DependencyWithInjectConstructor("Indirect dependency")));
             Component instance = getComponent(Component.class, ComponentWithInjectConstructor.class);
             assertNotNull(instance);
             Dependency dependency = ((ComponentWithInjectConstructor) instance).dependency();
@@ -98,12 +102,6 @@ public class InjectionTest {
         }
 
         @Test
-        void should_throw_exception_when_field_with_cyclic_dependencies() {
-            config.bind(ComponentWithComponentInjection.class, ComponentWithComponentInjection.class);
-            assertThrows(CyclicDependenciesFoundException.class, () -> config.context());
-        }
-
-        @Test
         void should_throw_exception_when_inject_field_is_final() {
             assertThrows(IllegalComponentException.class, () -> new ConstructorInjectionProvider<>(FinalInjectField.class));
         }
@@ -115,9 +113,8 @@ public class InjectionTest {
 
         @Test
         void should_call_inject_method_even_if_no_dependency_declared() {
-            config.bind(MethodInjectionWithNoDependency.class, MethodInjectionWithNoDependency.class);
-            Optional<MethodInjectionWithNoDependency> injection = config.context().get(MethodInjectionWithNoDependency.class);
-            assertEquals(1, injection.get().called());
+            MethodInjectionWithNoDependency component = getComponent(MethodInjectionWithNoDependency.class, MethodInjectionWithNoDependency.class);
+            assertEquals(1, component.called());
         }
 
         @Test
@@ -134,10 +131,6 @@ public class InjectionTest {
 
         @Test
         void should_inject_subclass_dependency_and_superclass_dependency() {
-            Dependency dependency = new Dependency() {};
-            Component componentInstance = new Component() {};
-            config.bind(Dependency.class, dependency);
-            config.bind(Component.class, componentInstance);
             SubClassWithInjectMethod component = getComponent(SubClassWithInjectMethod.class, SubClassWithInjectMethod.class);
             assertSame(componentInstance, component.component());
             assertSame(dependency, component.dependency());
@@ -168,8 +161,6 @@ public class InjectionTest {
 
             @BeforeEach
             void setUp() {
-                config.bind(String.class, "");
-                config.bind(Dependency.class, new Dependency() {});
                 component = getComponent(SubclassOfCompareInjectMethodOverride.class, SubclassOfCompareInjectMethodOverride.class);
             }
 
@@ -198,8 +189,7 @@ public class InjectionTest {
     }
 
     private <T, R extends T> T getComponent(Class<T> type, Class<R> implementation) {
-        config.bind(type, implementation);
-        return config.context().get(type).get();
+        return new ConstructorInjectionProvider<>(implementation).get(context);
     }
 
 }

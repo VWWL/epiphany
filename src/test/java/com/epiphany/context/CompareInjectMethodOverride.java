@@ -10,17 +10,17 @@ class CompareInjectMethodOverride {
     private int methodWithNameNotSame;
 
     @Inject
-    public void methodWithSameNameAndParameters(String p1) {
+    public void methodWithSameNameAndParameters(Component p1) {
         methodWithSameNameAndParameters++;
     }
 
     @Inject
-    public void methodWithParametersNotSame(String p1, Dependency p2, String p3) {
+    public void methodWithParametersNotSame(Component p1, Dependency p2, Component p3) {
         methodWithParametersNotSame++;
     }
 
     @Inject
-    public void methodWithNameNotSame(String p1) {
+    public void methodWithNameNotSame(Component p1) {
         methodWithNameNotSame++;
     }
 
