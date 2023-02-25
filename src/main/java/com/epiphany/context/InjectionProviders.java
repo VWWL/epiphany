@@ -4,6 +4,8 @@ import com.epiphany.context.exception.*;
 
 import java.util.*;
 
+import static com.epiphany.general.Exceptions.evaluate;
+
 public class InjectionProviders {
 
     private final Map<Class<?>, Provider<?>> impl;
@@ -22,6 +24,12 @@ public class InjectionProviders {
 
     public <Type, Implementation extends Type> void register(Class<Type> type, Class<Implementation> implementation) {
         impl.put(type, new InjectionProvider<>(implementation));
+    }
+
+    @SuppressWarnings("unchecked")
+    public <Type, Implementation extends Type> void register(Class<Type> type, ClassName className) {
+        Class<Implementation> implementation = (Class<Implementation>) evaluate(() -> Class.forName(className.className())).evaluate();
+        this.register(type, implementation);
     }
 
     public void checkDependencies() {

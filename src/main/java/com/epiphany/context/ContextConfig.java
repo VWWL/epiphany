@@ -16,6 +16,10 @@ public final class ContextConfig {
         injectionProviders.register(type, implementation);
     }
 
+    public <Type> void bind(Class<Type> type, ClassName className) {
+        injectionProviders.register(type, className);
+    }
+
     public Context context() {
         return new GeneralContext(injectionProviders);
     }

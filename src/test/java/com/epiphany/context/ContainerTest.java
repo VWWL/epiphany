@@ -48,6 +48,15 @@ public class ContainerTest {
             }
 
             @Test
+            void should_bind_type_from_class_path() {
+                config.bind(Dependency.class, new ClassName("com.epiphany.context.source.DependencyWithNestedDependency"));
+                config.bind(NestedDependency.class, new NestedDependency() {});
+                Optional<Dependency> dependency = config.context().get(Dependency.class);
+                assertTrue(dependency.isPresent());
+                assertThat(dependency.get()).isInstanceOf(DependencyWithNestedDependency.class);
+            }
+
+            @Test
             void should_return_empty_when_component_not_found() {
                 Optional<Component> component = config.context().get(Component.class);
                 assertEquals(Optional.empty(), component);
