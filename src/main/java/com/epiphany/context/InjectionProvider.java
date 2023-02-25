@@ -42,11 +42,6 @@ public final class InjectionProvider<Type> implements Provider<Type> {
         }).evaluate();
     }
 
-    @SuppressWarnings("all")
-    public Object[] toDependencies(Context context, Executable executable) {
-        return stream(executable.getParameters()).map(Parameter::getType).map(context::get).map(Optional::get).toArray(Object[]::new);
-    }
-
     @Override
     public List<Class<?>> dependencies() {
         return Stream.of(
@@ -115,6 +110,11 @@ public final class InjectionProvider<Type> implements Provider<Type> {
     @SuppressWarnings("unchecked")
     private static <Type> Constructor<Type> initInjectConstructor(Class<Type> component) {
         return (Constructor<Type>) injectableStream(component.getConstructors()).findFirst().orElseGet(() -> evaluate(component::getDeclaredConstructor).evaluate());
+    }
+
+    @SuppressWarnings("all")
+    public static Object[] toDependencies(Context context, Executable executable) {
+        return stream(executable.getParameters()).map(Parameter::getType).map(context::get).map(Optional::get).toArray(Object[]::new);
     }
 
     private static boolean isOverride(Method first, Method another) {
