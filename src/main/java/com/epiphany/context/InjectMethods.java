@@ -1,18 +1,21 @@
 package com.epiphany.context;
 
+import com.epiphany.context.exception.IllegalComponentException;
+
 import java.lang.reflect.Method;
 import java.util.*;
 
 public class InjectMethods {
 
-    private final List<Method> injectMethods;
+    private final List<Method> impl;
 
     public <Type> InjectMethods(Class<Type> component) {
-        this.injectMethods = initInjectMethods(component);
+        this.impl = initInjectMethods(component);
+        if (impl.stream().anyMatch(o -> o.getTypeParameters().length != 0)) throw new IllegalComponentException();
     }
 
     public List<Method> get() {
-        return injectMethods;
+        return impl;
     }
 
     private static <Type> List<Method> initInjectMethods(Class<Type> component) {
