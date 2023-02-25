@@ -21,7 +21,7 @@ public class ContainerTest {
     public class ComponentConstruction {
 
         @Nested
-        class Binding {
+        class TypeBinding {
 
             @Test
             void should_bind_type_to_a_specific_instance() {
@@ -40,19 +40,6 @@ public class ContainerTest {
 
         @Nested
         class DependencyCheck {
-
-            @Test
-            void should_not_throw_if_dependencies_are_all_distinct() {
-                config.bind(Component.class, ComponentWithInjectConstructor.class);
-                config.bind(Dependency.class, DependencyWithInjectConstructor.class);
-                config.bind(String.class, "");
-                assertDoesNotThrow(() -> config.context());
-            }
-
-        }
-
-        @Nested
-        class ErrorDependencyCheck {
 
             @Test
             void should_throw_when_dependency_is_not_found() {
@@ -85,6 +72,14 @@ public class ContainerTest {
             void should_throw_exception_when_field_with_cyclic_dependencies() {
                 config.bind(ComponentWithComponentInjection.class, ComponentWithComponentInjection.class);
                 assertThrows(CyclicDependenciesFoundException.class, () -> config.context());
+            }
+
+            @Test
+            void should_not_throw_if_dependencies_are_all_distinct() {
+                config.bind(Component.class, ComponentWithInjectConstructor.class);
+                config.bind(Dependency.class, DependencyWithInjectConstructor.class);
+                config.bind(String.class, "");
+                assertDoesNotThrow(() -> config.context());
             }
 
         }
