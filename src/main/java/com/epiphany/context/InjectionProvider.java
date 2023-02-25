@@ -42,7 +42,7 @@ public final class InjectionProvider<Type> implements Provider<Type> {
         return Stream.of(
             injectFields.dependencies(),
             injectMethods.stream().flatMap(m -> stream(m.getParameterTypes())),
-            stream(constructors.dependencies())
+            constructors.dependencies()
         ).flatMap(o -> o).collect(Collectors.toList());
     }
 

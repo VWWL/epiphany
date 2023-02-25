@@ -2,6 +2,7 @@ package com.epiphany.context;
 
 import java.lang.reflect.*;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static com.epiphany.general.Exceptions.evaluate;
 import static java.util.Arrays.stream;
@@ -15,8 +16,8 @@ public class InjectConstructor<Type> {
         this.impl = (Constructor<Type>) InjectStream.of(component.getConstructors()).injectablePart().findFirst().orElseGet(() -> evaluate(component::getDeclaredConstructor).evaluate());
     }
 
-    public Class<?>[] dependencies() {
-        return impl.getParameterTypes();
+    public Stream<Class<?>> dependencies() {
+        return stream(impl.getParameterTypes());
     }
 
     @SuppressWarnings("all")
