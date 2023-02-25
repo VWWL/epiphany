@@ -128,7 +128,15 @@ public class ContainerTest {
             }
 
             @Test
-            @Disabled
+            void should_inject_subclass_dependency_via_field() {
+                Dependency dependency = new Dependency() {};
+                config.bind(Dependency.class, dependency);
+                config.bind(ComponentWithFieldInjection.class, SubclassWithComponentWithFieldInjection.class);
+                ComponentWithFieldInjection component = config.context().get(ComponentWithFieldInjection.class).get();
+                assertSame(dependency, component.dependency());
+            }
+
+            @Test
             void should_include_field_dependency_in_denpendencies() {
                 ConstructorInjectionProvider<ComponentWithFieldInjection> provider = new ConstructorInjectionProvider<>(ComponentWithFieldInjection.class);
                 assertThat(provider.dependencies()).containsExactly(Dependency.class);
@@ -186,6 +194,9 @@ class ComponentWithComponentInjection {
         return component;
     }
 
+}
+
+class SubclassWithComponentWithFieldInjection extends ComponentWithFieldInjection {
 }
 
 class ComponentWithDefaultConstructor implements Component {

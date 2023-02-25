@@ -4,7 +4,7 @@ import jakarta.inject.Inject;
 
 import java.lang.reflect.*;
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.*;
 
 import static com.epiphany.general.Exceptions.evaluate;
 import static java.util.Arrays.stream;
@@ -40,11 +40,20 @@ public final class ConstructorInjectionProvider<Type> implements Provider<Type> 
 
     @Override
     public List<Class<?>> dependencies() {
-        return stream(injectConstructor.getParameters()).map(Parameter::getType).collect(Collectors.toList());
+        return Stream.concat(
+            injectFields.stream().map(Field::getType),
+            stream(injectConstructor.getParameters()).map(Parameter::getType)
+        ).collect(Collectors.toList());
     }
 
     private static <Type> List<Field> initInjectFields(Class<Type> component) {
-        return stream(component.getDeclaredFields()).filter(o -> o.isAnnotationPresent(Inject.class)).collect(Collectors.toList());
+        List<Field> injectFields = new ArrayList<>();
+        Class<?> current = component;
+        while (current != Object.class) {
+            injectFields.addAll(stream(current.getDeclaredFields()).filter(o -> o.isAnnotationPresent(Inject.class)).toList());
+            current = current.getSuperclass();
+        }
+        return injectFields;
     }
 
     @SuppressWarnings("unchecked")
