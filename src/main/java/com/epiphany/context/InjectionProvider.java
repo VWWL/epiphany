@@ -4,7 +4,6 @@ import com.epiphany.context.exception.IllegalComponentException;
 
 import java.lang.reflect.*;
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.stream.*;
 
 import static com.epiphany.general.Exceptions.evaluate;
@@ -13,15 +12,15 @@ import static java.util.Arrays.stream;
 public final class InjectionProvider<Type> implements Provider<Type> {
 
     private final InjectConstructor<Type> constructors;
-    private final List<Field> injectFields;
+    private final Fields injectFields;
     private final List<Method> injectMethods;
 
     public InjectionProvider(final Class<Type> component) {
         checkConstructor(component);
         this.constructors = new InjectConstructor<>(component);
-        this.injectFields = initInjectFields(component);
+        this.injectFields = new Fields(component);
         this.injectMethods = initInjectMethods(component);
-        if (injectFields.stream().anyMatch(o -> Modifier.isFinal(o.getModifiers()))) throw new IllegalComponentException();
+        if (injectFields.injectFields.stream().anyMatch(o -> Modifier.isFinal(o.getModifiers()))) throw new IllegalComponentException();
         if (injectMethods.stream().anyMatch(o -> o.getTypeParameters().length != 0)) throw new IllegalComponentException();
     }
 
@@ -30,7 +29,7 @@ public final class InjectionProvider<Type> implements Provider<Type> {
     public Type get(final Context context) {
         return evaluate(() -> {
             Type instance = constructors.newInstance(context);
-            for (Field field : injectFields) {
+            for (Field field : injectFields.injectFields) {
                 field.setAccessible(true);
                 field.set(instance, toDependency(context, field));
             }
@@ -45,7 +44,7 @@ public final class InjectionProvider<Type> implements Provider<Type> {
     @Override
     public List<Class<?>> dependencies() {
         return Stream.of(
-            injectFields.stream().map(Field::getType),
+            injectFields.injectFields.stream().map(Field::getType),
             injectMethods.stream().flatMap(m -> stream(m.getParameterTypes())),
             stream(constructors.dependencyClasses())
         ).flatMap(o -> o).collect(Collectors.toList());
@@ -69,12 +68,8 @@ public final class InjectionProvider<Type> implements Provider<Type> {
         return stream(implementation.getConstructors()).filter(c -> c.isAnnotationPresent(Inject.class)).count();
     }
 
-    private static <Type> List<Field> initInjectFields(Class<Type> component) {
-        return traverse(component, (injectMethods1, current) -> injectableStream(current.getDeclaredFields()).toList());
-    }
-
     private static <Type> List<Method> initInjectMethods(Class<Type> component) {
-        List<Method> methods = traverse(component, (methods1, current) -> injectableStream(current.getDeclaredMethods())
+        List<Method> methods = new Traverser<Method>().traverse(component, (methods1, current) -> injectableStream(current.getDeclaredMethods())
             .filter(o -> isOverrideByInjectMethod(methods1, o))
             .filter(o -> isOverrideByNoInjectMethod(component, o))
             .toList());
@@ -98,16 +93,6 @@ public final class InjectionProvider<Type> implements Provider<Type> {
     @SuppressWarnings("all")
     public static Object[] toDependencies(Context context, Executable executable) {
         return stream(executable.getParameters()).map(Parameter::getType).map(context::get).map(Optional::get).toArray(Object[]::new);
-    }
-
-    private static <T> List<T> traverse(Class<?> component, BiFunction<List<T>, Class<?>, List<T>> finder) {
-        List<T> members = new ArrayList<>();
-        Class<?> current = component;
-        while (current != Object.class) {
-            members.addAll(finder.apply(members, current));
-            current = current.getSuperclass();
-        }
-        return members;
     }
 
     private static boolean isOverride(Method first, Method another) {
