@@ -209,6 +209,36 @@ public class ContainerTest {
                 assertNull(component.dependency());
             }
 
+            @Nested
+            class ParseMethodIsOverride {
+
+                private SubclassOfCompareInjectMethodOverride component;
+
+                @BeforeEach
+                void setUp() {
+                    config.bind(String.class, "");
+                    config.bind(Dependency.class, new Dependency() {});
+                    config.bind(SubclassOfCompareInjectMethodOverride.class, SubclassOfCompareInjectMethodOverride.class);
+                    component = config.context().get(SubclassOfCompareInjectMethodOverride.class).get();
+                }
+
+                @Test
+                void should_findout_which_is_override_method_when_method_is_same() {
+                    assertEquals(0, component.methodWithSameNameAndParameters());
+                }
+
+                @Test
+                void should_findout_which_is_override_method_when_method_name_is_different() {
+                    assertEquals(1, component.methodWithNameNotSame());
+                }
+
+                @Test
+                void should_findout_which_is_override_method_when_method_parameters_is_different() {
+                    assertEquals(1, component.methodWithParametersNotSame());
+                }
+
+            }
+
         }
 
     }
@@ -230,6 +260,66 @@ interface Component {}
 interface Dependency {}
 
 interface NestedDependency {}
+
+@SuppressWarnings("unused")
+class CompareInjectMethodOverride {
+
+    private int methodWithSameNameAndParameters;
+    private int methodWithParametersNotSame;
+    private int methodWithNameNotSame;
+
+    @Inject
+    public void methodWithSameNameAndParameters(String p1) {
+        methodWithSameNameAndParameters++;
+    }
+
+    @Inject
+    public void methodWithParametersNotSame(String p1, Dependency p2, String p3) {
+        methodWithParametersNotSame++;
+    }
+
+    @Inject
+    public void methodWithNameNotSame(String p1) {
+        methodWithNameNotSame++;
+    }
+
+    public int methodWithSameNameAndParameters() {
+        return methodWithSameNameAndParameters;
+    }
+
+    public int methodWithParametersNotSame() {
+        return methodWithParametersNotSame;
+    }
+
+    public int methodWithNameNotSame() {
+        return methodWithNameNotSame;
+    }
+
+}
+
+@SuppressWarnings("unused")
+class SubclassOfCompareInjectMethodOverride extends CompareInjectMethodOverride {
+
+    @Inject
+    @Override
+    public void methodWithSameNameAndParameters(String p1) {
+    }
+
+    @Inject
+    public void methodWithParametersNotSame(Dependency p1, String p2, String p3) {
+    }
+
+    public void methodWithParametersNotSame(String p1, String p2, Dependency p3) {
+    }
+
+    @Inject
+    public void theNotSameMethodOfMethodWithNameNotSame(String p1) {
+    }
+
+    public void theNotSameMethodOfMethodWithNameNotSame2(String p1) {
+    }
+
+}
 
 class SubClassOverrideSuperClassWithInject extends SuperClassWithInjectMethod {
 
@@ -257,10 +347,6 @@ class SuperClassWithInjectMethod {
     @Inject
     public void inject(Dependency dependency) {
         this.dependency = dependency;
-    }
-
-    @Inject
-    public void inject() {
     }
 
     public Dependency dependency() {
