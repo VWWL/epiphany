@@ -1,6 +1,8 @@
 # Epiphany
 
-A dependency injection framework. Using TDD (Test-Driven Design).
+[![CI](https://github.com/neilwangweili/epiphany/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/neilwangweili/epiphany/actions/workflows/main.yml)
+
+A dependency injection framework. Using TDD (Test-Driven Design). Code coverage is 100%. Tests are documents.
 
 ## Usage
 
