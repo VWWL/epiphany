@@ -22,28 +22,30 @@ public class InjectionTest {
 
         @Test
         void should_bind_class_to_a_default_constructor() {
-            config.bind(Component.class, ComponentWithDefaultConstructor.class);
-            Component instance = config.context().get(Component.class).get();
+            Component instance = getComponent(Component.class, ComponentWithDefaultConstructor.class);
             assertNotNull(instance);
             assertTrue(instance instanceof ComponentWithDefaultConstructor);
+        }
+
+        private <T, R extends T> T getComponent(Class<T> type, Class<R> implementation) {
+            config.bind(type, implementation);
+            return config.context().get(type).get();
         }
 
         @Test
         void should_bind_type_to_a_inject_constructor() {
             Dependency dependency = new Dependency() {};
-            config.bind(Component.class, ComponentWithInjectConstructor.class);
             config.bind(Dependency.class, dependency);
-            Component instance = config.context().get(Component.class).get();
+            Component instance = getComponent(Component.class, ComponentWithInjectConstructor.class);
             assertNotNull(instance);
             assertSame(dependency, ((ComponentWithInjectConstructor) instance).dependency());
         }
 
         @Test
         void should_bind_type_to_a_class_with_transitive_dependencies() {
-            config.bind(Component.class, ComponentWithInjectConstructor.class);
             config.bind(Dependency.class, DependencyWithInjectConstructor.class);
             config.bind(String.class, "Indirect dependency");
-            Component instance = config.context().get(Component.class).get();
+            Component instance = getComponent(Component.class, ComponentWithInjectConstructor.class);
             assertNotNull(instance);
             Dependency dependency = ((ComponentWithInjectConstructor) instance).dependency();
             assertNotNull(dependency);
