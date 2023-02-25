@@ -182,6 +182,7 @@ interface Dependency {}
 
 interface NestedDependency {}
 
+@SuppressWarnings("unused")
 class MethodInjectionWithNoDependency {
 
     private int called = 0;
