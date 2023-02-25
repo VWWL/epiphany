@@ -2,9 +2,9 @@ package com.epiphany.context;
 
 import jakarta.inject.Inject;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
 import java.util.*;
-import java.util.stream.*;
+import java.util.stream.Stream;
 
 import static com.epiphany.general.Exceptions.evaluate;
 import static java.util.Arrays.stream;
@@ -12,27 +12,23 @@ import static java.util.Arrays.stream;
 public class ContextConfig {
 
     private final Map<Class<?>, Provider<?>> providers;
-    private final Map<Class<?>, List<Class<?>>> dependencies;
 
     public ContextConfig() {
         this.providers = new HashMap<>();
-        this.dependencies = new HashMap<>();
     }
 
     public <Type> void bind(final Class<Type> type, final Type instance) {
         providers.put(type, context -> instance);
-        dependencies.put(type, List.of());
     }
 
     public <Type, Implementation extends Type> void bind(final Class<Type> type, final Class<Implementation> implementation) {
         check(implementation);
         Constructor<Implementation> injectConstructor = injectConstructor(implementation);
         providers.put(type, new ConstructorInjectionProvider<>(injectConstructor));
-        dependencies.put(type, stream(injectConstructor.getParameters()).map(Parameter::getType).collect(Collectors.toList()));
     }
 
     public Context context() {
-        dependencies.keySet().forEach(component -> checkDependencies(component, new Stack<>()));
+        providers.keySet().forEach(component -> checkDependencies(component, new Stack<>()));
         return new Context() {
             @Override
             @SuppressWarnings("unchecked")
@@ -66,8 +62,8 @@ public class ContextConfig {
     }
 
     private void checkDependencies(Class<?> component, Stack<Class<?>> visiting) {
-        for (Class<?> dependency : dependencies.get(component)) {
-            if (!dependencies.containsKey(dependency)) throw new DependencyNotFoundException(dependency, component);
+        for (Class<?> dependency : providers.get(component).dependencies()) {
+            if (!providers.containsKey(dependency)) throw new DependencyNotFoundException(dependency, component);
             if (visiting.contains(dependency)) throw new CyclicDependenciesFoundException(visiting);
             visiting.push(dependency);
             checkDependencies(dependency, visiting);
