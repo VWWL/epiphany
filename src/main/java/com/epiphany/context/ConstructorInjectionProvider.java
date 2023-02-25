@@ -13,10 +13,12 @@ public final class ConstructorInjectionProvider<Type> implements Provider<Type> 
 
     private final Constructor<Type> injectConstructor;
     private final List<Field> injectFields;
+    private final List<Method> injectMethods;
 
     public ConstructorInjectionProvider(final Class<Type> component) {
         this.injectConstructor = initInjectConstructor(component);
         this.injectFields = initInjectFields(component);
+        this.injectMethods = initInjectMethods(component);
     }
 
     @Override
@@ -33,6 +35,10 @@ public final class ConstructorInjectionProvider<Type> implements Provider<Type> 
             for (Field field : injectFields) {
                 field.setAccessible(true);
                 field.set(instance, context.get(field.getType()).get());
+            }
+            for (Method method : injectMethods) {
+                method.setAccessible(true);
+                method.invoke(instance, stream(method.getParameterTypes()).map(t -> context.get(t)).map(o -> o.get()).toArray(Object[]::new));
             }
             return instance;
         }).evaluate();
@@ -62,6 +68,10 @@ public final class ConstructorInjectionProvider<Type> implements Provider<Type> 
             .filter(c -> c.isAnnotationPresent(Inject.class))
             .findFirst()
             .orElseGet(() -> evaluate(component::getDeclaredConstructor).evaluate());
+    }
+
+    private static <Type> List<Method> initInjectMethods(Class<Type> component) {
+        return stream(component.getDeclaredMethods()).filter(o -> o.isAnnotationPresent(Inject.class)).collect(Collectors.toList());
     }
 
 }

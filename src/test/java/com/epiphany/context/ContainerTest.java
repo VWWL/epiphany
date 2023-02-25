@@ -153,6 +153,13 @@ public class ContainerTest {
         @Nested
         public class MethodInjection {
 
+            @Test
+            void should_call_inject_method_even_if_no_dependency_declared() {
+                config.bind(MethodInjectionWithNoDependency.class, MethodInjectionWithNoDependency.class);
+                Optional<MethodInjectionWithNoDependency> injection = config.context().get(MethodInjectionWithNoDependency.class);
+                assertEquals(1, injection.get().called());
+            }
+
         }
 
     }
@@ -174,6 +181,21 @@ interface Component {}
 interface Dependency {}
 
 interface NestedDependency {}
+
+class MethodInjectionWithNoDependency {
+
+    private int called = 0;
+
+    @Inject
+    void install() {
+        called++;
+    }
+
+    public int called() {
+        return called;
+    }
+
+}
 
 class ComponentWithFieldInjection {
 
