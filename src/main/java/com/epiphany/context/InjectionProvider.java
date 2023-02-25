@@ -49,7 +49,7 @@ public final class InjectionProvider<Type> implements Provider<Type> {
         return Stream.of(
             injectFields.stream().map(Field::getType),
             injectMethods.stream().flatMap(m -> stream(m.getParameterTypes())),
-            stream(injectConstructor.getParameters()).map(Parameter::getType)
+            stream(injectConstructor.getParameterTypes())
         ).flatMap(o -> o).collect(Collectors.toList());
     }
 
