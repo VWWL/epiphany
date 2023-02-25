@@ -16,10 +16,6 @@ class ConstructorInjectionProvider<Type> implements Provider<Type> {
 
     @Override
     public Type get(Context context) {
-        return createInstanceByInjectOrDefaultConstructor(context);
-    }
-
-    private Type createInstanceByInjectOrDefaultConstructor(Context context) {
         Object[] dependencies = stream(injectConstructor.getParameters())
             .map(Parameter::getType)
             .map(context::get)
