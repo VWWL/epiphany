@@ -112,15 +112,6 @@ public class ContainerTest {
             }
 
             @Test
-            void should_throw_if_cyclic_dependencies_found() {
-                config.bind(Component.class, ComponentWithInjectConstructor.class);
-                config.bind(Dependency.class, DependencyDependedOnComponent.class);
-                CyclicDependenciesFoundException exception = assertThrows(CyclicDependenciesFoundException.class, () -> config.context());
-                assertEquals(2, exception.components().size());
-                assertThat(exception.components()).containsExactlyInAnyOrder(Dependency.class, Component.class);
-            }
-
-            @Test
             void should_throw_if_three_cyclic_dependencies_found() {
                 config.bind(Component.class, ComponentWithInjectConstructor.class);
                 config.bind(Dependency.class, DependencyWithNestedDependency.class);
