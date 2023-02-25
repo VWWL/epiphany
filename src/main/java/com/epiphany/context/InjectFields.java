@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static com.epiphany.general.Exceptions.execute;
-import static java.util.Arrays.stream;
 
 public class InjectFields {
 
