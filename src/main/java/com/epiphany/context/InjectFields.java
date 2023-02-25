@@ -9,11 +9,11 @@ import java.util.stream.Stream;
 import static com.epiphany.general.Exceptions.execute;
 import static java.util.Arrays.stream;
 
-public class Fields {
+public class InjectFields {
 
     private final List<Field> impl;
 
-    public <Type> Fields(Class<Type> component) {
+    public <Type> InjectFields(Class<Type> component) {
         this.impl = new Traverser<Field>().traverse(component, (injectMethods1, current) -> stream(current.getDeclaredFields()).filter(o -> o.isAnnotationPresent(Inject.class)).toList());
         if (impl.stream().anyMatch(o -> Modifier.isFinal(o.getModifiers()))) throw new IllegalComponentException();
     }

@@ -12,13 +12,13 @@ import static java.util.Arrays.stream;
 public final class InjectionProvider<Type> implements Provider<Type> {
 
     private final InjectConstructor<Type> constructors;
-    private final Fields injectFields;
+    private final InjectFields injectFields;
     private final List<Method> injectMethods;
 
     public InjectionProvider(final Class<Type> component) {
         checkConstructor(component);
         this.constructors = new InjectConstructor<>(component);
-        this.injectFields = new Fields(component);
+        this.injectFields = new InjectFields(component);
         this.injectMethods = initInjectMethods(component);
         if (injectMethods.stream().anyMatch(o -> o.getTypeParameters().length != 0)) throw new IllegalComponentException();
     }
