@@ -95,7 +95,7 @@ public final class InjectionProvider<Type> implements Provider<Type> {
         while (current != Object.class) {
             List<Method> currentInjectMethods = injectableStream(current.getDeclaredMethods())
                 .filter(o -> injectMethods.stream().noneMatch(m -> m.getName().equals(o.getName()) && Arrays.equals(m.getParameterTypes(), o.getParameterTypes())))
-                .filter(o -> injectableStream(component.getDeclaredMethods()).noneMatch(m -> m.getName().equals(o.getName()) && Arrays.equals(m.getParameterTypes(), o.getParameterTypes())))
+                .filter(o -> uninjectableStream(component.getDeclaredMethods()).noneMatch(m -> m.getName().equals(o.getName()) && Arrays.equals(m.getParameterTypes(), o.getParameterTypes())))
                 .toList();
             injectMethods.addAll(currentInjectMethods);
             current = current.getSuperclass();
@@ -111,6 +111,10 @@ public final class InjectionProvider<Type> implements Provider<Type> {
 
     private static <T extends AnnotatedElement> Stream<T> injectableStream(T[] declaredFields) {
         return stream(declaredFields).filter(o -> o.isAnnotationPresent(Inject.class));
+    }
+
+    private static <T extends AnnotatedElement> Stream<T> uninjectableStream(T[] declaredFields) {
+        return stream(declaredFields).filter(o -> !o.isAnnotationPresent(Inject.class));
     }
 
 }
