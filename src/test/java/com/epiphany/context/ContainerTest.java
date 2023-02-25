@@ -202,6 +202,13 @@ public class ContainerTest {
                 assertNull(component.dependency());
             }
 
+            @Test
+            void should_not_call_inject_method_if_override_with_no_inject() {
+                config.bind(SubClassOverrideSuperClassWithNoInject.class, SubClassOverrideSuperClassWithNoInject.class);
+                SubClassOverrideSuperClassWithNoInject component = config.context().get(SubClassOverrideSuperClassWithNoInject.class).get();
+                assertNull(component.dependency());
+            }
+
         }
 
     }
@@ -229,6 +236,15 @@ class SubClassOverrideSuperClassWithInject extends SuperClassWithInjectMethod {
     @Inject
     @Override
     public void injectDependency(Dependency dependency) {
+    }
+
+}
+
+class SubClassOverrideSuperClassWithNoInject extends SuperClassWithInjectMethod {
+
+    @Override
+    public void injectDependency(Dependency dependency) {
+        super.injectDependency(dependency);
     }
 
 }

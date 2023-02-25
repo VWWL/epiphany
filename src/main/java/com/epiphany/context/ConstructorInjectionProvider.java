@@ -70,6 +70,7 @@ public final class ConstructorInjectionProvider<Type> implements Provider<Type> 
             List<Method> currentInjectMethods = stream(current.getDeclaredMethods())
                 .filter(o -> o.isAnnotationPresent(Inject.class))
                 .filter(o -> injectMethods.stream().noneMatch(m -> m.getName().equals(o.getName()) && Arrays.equals(m.getParameterTypes(), o.getParameterTypes())))
+                .filter(o -> stream(component.getDeclaredMethods()).filter(m -> !m.isAnnotationPresent(Inject.class)).noneMatch(m -> m.getName().equals(o.getName()) && Arrays.equals(m.getParameterTypes(), o.getParameterTypes())))
                 .toList();
             injectMethods.addAll(currentInjectMethods);
             current = current.getSuperclass();
