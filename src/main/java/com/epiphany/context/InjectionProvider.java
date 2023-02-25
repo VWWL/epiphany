@@ -94,8 +94,8 @@ public final class InjectionProvider<Type> implements Provider<Type> {
         Class<?> current = component;
         while (current != Object.class) {
             List<Method> currentInjectMethods = injectableStream(current.getDeclaredMethods())
-                .filter(o -> injectMethods.stream().noneMatch(m -> m.getName().equals(o.getName()) && Arrays.equals(m.getParameterTypes(), o.getParameterTypes())))
-                .filter(o -> uninjectableStream(component.getDeclaredMethods()).noneMatch(m -> m.getName().equals(o.getName()) && Arrays.equals(m.getParameterTypes(), o.getParameterTypes())))
+                .filter(o -> injectMethods.stream().noneMatch(m -> isOverride(o, m)))
+                .filter(o -> uninjectableStream(component.getDeclaredMethods()).noneMatch(m -> isOverride(o, m)))
                 .toList();
             injectMethods.addAll(currentInjectMethods);
             current = current.getSuperclass();
@@ -107,6 +107,10 @@ public final class InjectionProvider<Type> implements Provider<Type> {
     @SuppressWarnings("unchecked")
     private static <Type> Constructor<Type> initInjectConstructor(Class<Type> component) {
         return (Constructor<Type>) injectableStream(component.getConstructors()).findFirst().orElseGet(() -> evaluate(component::getDeclaredConstructor).evaluate());
+    }
+
+    private static boolean isOverride(Method first, Method another) {
+        return another.getName().equals(first.getName()) && Arrays.equals(another.getParameterTypes(), first.getParameterTypes());
     }
 
     private static <T extends AnnotatedElement> Stream<T> injectableStream(T[] declaredFields) {
