@@ -111,20 +111,40 @@ public class ContainerTest {
                 return arguments.stream();
             }
 
-            @Test
-            void should_throw_if_three_cyclic_dependencies_found() {
-                config.bind(Component.class, ComponentWithInjectConstructor.class);
-                config.bind(Dependency.class, DependencyWithNestedDependency.class);
-                config.bind(NestedDependency.class, NestedDependencyOnComponent.class);
+            @ParameterizedTest(name = "indirect cyclic dependency between {0}, {1} and {2}")
+            @MethodSource
+            void should_throw_exception_if_transitive_cyclic_dependencies_found(Class<? extends Component> component, Class<? extends Dependency> dependency, Class<? extends AnotherDependency> anotherDependency) {
+                config.bind(Component.class, component);
+                config.bind(Dependency.class, dependency);
+                config.bind(AnotherDependency.class, anotherDependency);
                 CyclicDependenciesFoundException exception = assertThrows(CyclicDependenciesFoundException.class, () -> config.context());
                 assertEquals(3, exception.components().size());
-                assertThat(exception.components()).containsExactlyInAnyOrder(Component.class, Dependency.class, NestedDependency.class);
+                assertThat(exception.components()).containsExactlyInAnyOrder(Component.class, Dependency.class, AnotherDependency.class);
             }
 
-            @Test
-            void should_throw_exception_when_field_with_cyclic_dependencies() {
-                config.bind(ComponentWithComponentInjection.class, ComponentWithComponentInjection.class);
-                assertThrows(CyclicDependenciesFoundException.class, () -> config.context());
+            public static Stream<Arguments> should_throw_exception_if_transitive_cyclic_dependencies_found() {
+                List<Arguments> arguments = new ArrayList<>();
+                for (Named component : List.of(
+                    Named.of("Inject Constructor", CyclicComponentInjectConstructor.class),
+                    Named.of("Inject Field", CyclicComponentInjectField.class),
+                    Named.of("Inject Method", CyclicComponentInjectMethod.class))
+                ) {
+                    for (Named dependency : List.of(
+                        Named.of("Inject Constructor", IndirectCyclicDependencyInjectConstructor.class),
+                        Named.of("Inject Field", IndirectCyclicDependencyInjectField.class),
+                        Named.of("Inject Method", IndirectCyclicDependencyInjectMethod.class)
+                    )) {
+                        for (Named anotherDependency : List.of(
+                            Named.of("Inject Constructor", IndirectCyclicComponentInjectConstructor.class),
+                            Named.of("Inject Field", IndirectCyclicComponentInjectField.class),
+                            Named.of("Inject Method", IndirectCyclicComponentInjectMethod.class)
+                        )) {
+                            arguments.add(Arguments.of(component, dependency, anotherDependency));
+                        }
+                    }
+                }
+                return arguments.stream();
+
             }
 
             @Test
