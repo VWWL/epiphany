@@ -13,10 +13,10 @@ import java.util.stream.Stream;
 import static com.epiphany.general.Exceptions.evaluate;
 import static java.util.Arrays.stream;
 
-public class Context {
+public class ContextConfig {
     private final Map<Class<?>, Provider<?>> providers;
 
-    public Context() {
+    public ContextConfig() {
         this.providers = new HashMap<>();
     }
 
@@ -84,7 +84,7 @@ public class Context {
             Constructor<Type> injectConstructor = injectConstructor(implementation);
             Object[] dependencies = stream(injectConstructor.getParameters())
                     .map(Parameter::getType)
-                    .map(type -> Context.this.get(type).orElseThrow(() -> new DependencyNotFoundException(type, componentType)))
+                    .map(type -> ContextConfig.this.get(type).orElseThrow(() -> new DependencyNotFoundException(type, componentType)))
                     .toArray(Object[]::new);
             return evaluate(() -> injectConstructor.newInstance(dependencies)).evaluate();
         }
