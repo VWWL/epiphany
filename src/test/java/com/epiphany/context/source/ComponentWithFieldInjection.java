@@ -1,8 +1,8 @@
-package com.epiphany.context;
+package com.epiphany.context.source;
 
 import jakarta.inject.Inject;
 
-class ComponentWithFieldInjection {
+public class ComponentWithFieldInjection {
 
     private @Inject Dependency dependency;
 

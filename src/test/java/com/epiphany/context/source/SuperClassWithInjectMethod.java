@@ -1,9 +1,9 @@
-package com.epiphany.context;
+package com.epiphany.context.source;
 
 import jakarta.inject.Inject;
 
 @SuppressWarnings("unused")
-class SuperClassWithInjectMethod {
+public class SuperClassWithInjectMethod {
 
     private Dependency dependency;
 

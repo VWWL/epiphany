@@ -1,9 +1,9 @@
-package com.epiphany.context;
+package com.epiphany.context.source;
 
 import jakarta.inject.Inject;
 
 @SuppressWarnings("unused")
-class SubclassOfCompareInjectMethodOverride extends CompareInjectMethodOverride {
+public class SubclassOfCompareInjectMethodOverride extends CompareInjectMethodOverride {
 
     @Inject
     @Override

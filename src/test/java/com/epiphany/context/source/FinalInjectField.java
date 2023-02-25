@@ -1,9 +1,9 @@
-package com.epiphany.context;
+package com.epiphany.context.source;
 
 import jakarta.inject.Inject;
 
 @SuppressWarnings("unused")
-class FinalInjectField {
+public class FinalInjectField {
 
     final @Inject Dependency dependency = null;
 

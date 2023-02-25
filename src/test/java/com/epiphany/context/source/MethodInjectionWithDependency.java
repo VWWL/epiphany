@@ -1,9 +1,9 @@
-package com.epiphany.context;
+package com.epiphany.context.source;
 
 import jakarta.inject.Inject;
 
 @SuppressWarnings("unused")
-class MethodInjectionWithDependency {
+public class MethodInjectionWithDependency {
 
     private Dependency dependency;
 

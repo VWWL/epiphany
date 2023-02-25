@@ -1,9 +1,9 @@
-package com.epiphany.context;
+package com.epiphany.context.source;
 
 import jakarta.inject.Inject;
 
 @SuppressWarnings("unused")
-class ComponentWithMultiConstructorProvided implements Component {
+public class ComponentWithMultiConstructorProvided implements Component {
 
     public @Inject ComponentWithMultiConstructorProvided(final String name, final Double value) {
     }

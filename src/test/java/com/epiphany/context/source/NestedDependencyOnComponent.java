@@ -1,9 +1,9 @@
-package com.epiphany.context;
+package com.epiphany.context.source;
 
 import jakarta.inject.Inject;
 
 @SuppressWarnings("unused")
-class NestedDependencyOnComponent implements NestedDependency {
+public class NestedDependencyOnComponent implements NestedDependency {
 
     public @Inject NestedDependencyOnComponent(final Component component) {
     }

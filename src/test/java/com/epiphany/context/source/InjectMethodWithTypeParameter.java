@@ -1,9 +1,9 @@
-package com.epiphany.context;
+package com.epiphany.context.source;
 
 import jakarta.inject.Inject;
 
 @SuppressWarnings("unused")
-class InjectMethodWithTypeParameter {
+public class InjectMethodWithTypeParameter {
 
     @Inject
     <T> void install() {

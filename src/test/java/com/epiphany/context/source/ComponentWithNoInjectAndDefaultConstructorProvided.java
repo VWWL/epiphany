@@ -1,7 +1,7 @@
-package com.epiphany.context;
+package com.epiphany.context.source;
 
 @SuppressWarnings("unused")
-class ComponentWithNoInjectAndDefaultConstructorProvided implements Component {
+public class ComponentWithNoInjectAndDefaultConstructorProvided implements Component {
 
     public ComponentWithNoInjectAndDefaultConstructorProvided(final String name, final Double value) {
     }

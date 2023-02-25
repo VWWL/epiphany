@@ -1,8 +1,8 @@
-package com.epiphany.context;
+package com.epiphany.context.source;
 
 import jakarta.inject.Inject;
 
-class ComponentWithInjectConstructor implements Component {
+public class ComponentWithInjectConstructor implements Component {
 
     private final Dependency dependency;
 
