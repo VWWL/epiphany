@@ -1,5 +1,6 @@
 package com.epiphany.context;
 
+import com.epiphany.context.exception.IllegalComponentException;
 import jakarta.inject.Inject;
 
 import java.lang.reflect.*;

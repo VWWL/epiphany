@@ -1,4 +1,4 @@
-package com.epiphany.context;
+package com.epiphany.context.exception;
 
 import java.util.*;
 
