@@ -6,23 +6,22 @@ import java.lang.reflect.*;
 
 import static java.util.Arrays.stream;
 
-public class InjectConstructorChecker<Type> {
+public class InjectComponent<Type> {
 
     private final Class<Type> component;
 
-    public InjectConstructorChecker(Class<Type> component) {
+    public InjectComponent(Class<Type> component) {
         this.component = component;
     }
 
-    public Class<Type> component() {
-        return component;
+    public void check() {
+        if (Modifier.isAbstract(component.getModifiers())) throw new IllegalComponentException();
+        if (oneMoreInjectConstructors()) throw new IllegalComponentException();
+        if (noInjectConstructor() && noDefaultConstructor()) throw new IllegalComponentException();
     }
 
-    public void check() {
-        Class<Type> component = component();
-        if (Modifier.isAbstract(component.getModifiers())) throw new IllegalComponentException();
-        if (InjectStream.of(component.getConstructors()).injectablePart().count() > 1) throw new IllegalComponentException();
-        if (noInjectConstructor() && noDefaultConstructor()) throw new IllegalComponentException();
+    private boolean oneMoreInjectConstructors() {
+        return InjectStream.of(component.getConstructors()).injectablePart().count() > 1;
     }
 
     private boolean noInjectConstructor() {

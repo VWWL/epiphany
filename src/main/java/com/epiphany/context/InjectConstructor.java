@@ -13,7 +13,7 @@ public class InjectConstructor<Type> {
 
     @SuppressWarnings("unchecked")
     public InjectConstructor(Class<Type> component) {
-        new InjectConstructorChecker<>(component).check();
+        new InjectComponent<>(component).check();
         this.impl = (Constructor<Type>) InjectStream.of(component.getConstructors()).injectablePart().findFirst().orElseGet(() -> evaluate(component::getDeclaredConstructor).evaluate());
     }
 
