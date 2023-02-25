@@ -4,6 +4,7 @@ import com.epiphany.context.exception.IllegalComponentException;
 
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static com.epiphany.general.Exceptions.execute;
 import static java.util.Arrays.stream;
@@ -17,8 +18,8 @@ public class InjectMethods {
         if (impl.stream().anyMatch(o -> o.getTypeParameters().length != 0)) throw new IllegalComponentException();
     }
 
-    public List<Method> get() {
-        return impl;
+    Stream<Class<?>> dependencies() {
+        return impl.stream().flatMap(m -> stream(m.getParameterTypes()));
     }
 
     public <Type> void injectInto(Context context, Type instance) {
