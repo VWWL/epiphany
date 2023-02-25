@@ -14,7 +14,7 @@ public class InjectFields {
     private final List<Field> impl;
 
     public <Type> InjectFields(Class<Type> component) {
-        this.impl = new Traverser<Field>().traverse(component, (methods, current) -> stream(current.getDeclaredFields()).filter(o -> o.isAnnotationPresent(Inject.class)).toList());
+        this.impl = new Traverser<Field>().traverse(component, (methods, current) -> InjectStream.of(current.getDeclaredFields()).injectablePart().toList());
         if (impl.stream().anyMatch(o -> Modifier.isFinal(o.getModifiers()))) throw new IllegalComponentException();
     }
 
