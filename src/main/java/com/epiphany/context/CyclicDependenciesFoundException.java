@@ -4,9 +4,10 @@ import java.util.*;
 
 public class CyclicDependenciesFoundException extends RuntimeException {
 
-    private final Set<Class<?>> components = new LinkedHashSet<>();
+    private final Set<Class<?>> components;
 
     public CyclicDependenciesFoundException(Stack<Class<?>> visiting) {
+        components = new LinkedHashSet<>();
         components.addAll(visiting);
     }
 
