@@ -11,7 +11,6 @@ repositories {
 }
 
 dependencies {
-    implementation("jakarta.inject:jakarta.inject-api:2.0.1")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.8.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.2")
@@ -20,7 +19,6 @@ dependencies {
     testImplementation("org.mockito:mockito-core:4.6.1")
     testImplementation("org.mockito:mockito-junit-jupiter:4.6.1")
     testImplementation("org.assertj:assertj-core:3.23.1")
-    testImplementation("jakarta.inject:jakarta.inject-tck:2.0.1")
 }
 tasks.withType<Test> {
     useJUnitPlatform()
