@@ -69,7 +69,7 @@ public final class InjectionProvider<Type> implements Provider<Type> {
     }
 
     private static <Type> List<Method> initInjectMethods(Class<Type> component) {
-        List<Method> methods = new Traverser<Method>().traverse(component, (methods1, current) -> injectableStream(current.getDeclaredMethods())
+        List<Method> methods = new Traverser<Method>().traverse(component, (methods1, current) -> InjectStream.of(current.getDeclaredMethods()).injectablePart()
             .filter(o -> isOverrideByInjectMethod(methods1, o))
             .filter(o -> isOverrideByNoInjectMethod(component, o))
             .toList());
@@ -78,7 +78,7 @@ public final class InjectionProvider<Type> implements Provider<Type> {
     }
 
     private static <Type> boolean isOverrideByNoInjectMethod(Class<Type> component, Method method) {
-        return uninjectableStream(component.getDeclaredMethods()).noneMatch(m -> isOverride(method, m));
+        return InjectStream.of(component.getDeclaredMethods()).notInjectablePart().noneMatch(m -> isOverride(method, m));
     }
 
     private static boolean isOverrideByInjectMethod(List<Method> injectMethods, Method method) {
@@ -97,14 +97,6 @@ public final class InjectionProvider<Type> implements Provider<Type> {
 
     private static boolean isOverride(Method first, Method another) {
         return another.getName().equals(first.getName()) && Arrays.equals(another.getParameterTypes(), first.getParameterTypes());
-    }
-
-    private static <T extends AnnotatedElement> Stream<T> injectableStream(T[] declaredFields) {
-        return stream(declaredFields).filter(o -> o.isAnnotationPresent(Inject.class));
-    }
-
-    private static <T extends AnnotatedElement> Stream<T> uninjectableStream(T[] declaredFields) {
-        return stream(declaredFields).filter(o -> !o.isAnnotationPresent(Inject.class));
     }
 
 }

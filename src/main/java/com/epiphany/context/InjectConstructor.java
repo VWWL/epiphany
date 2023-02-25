@@ -2,7 +2,6 @@ package com.epiphany.context;
 
 import java.lang.reflect.*;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static com.epiphany.general.Exceptions.evaluate;
 import static java.util.Arrays.stream;
@@ -13,11 +12,7 @@ public class InjectConstructor<Type> {
 
     @SuppressWarnings("unchecked")
     public InjectConstructor(Class<Type> component) {
-        this.impl = (Constructor<Type>) injectableStream(component.getConstructors()).findFirst().orElseGet(() -> evaluate(component::getDeclaredConstructor).evaluate());
-    }
-
-    private static <T extends AnnotatedElement> Stream<T> injectableStream(T[] declaredFields) {
-        return stream(declaredFields).filter(o -> o.isAnnotationPresent(Inject.class));
+        this.impl = (Constructor<Type>) InjectStream.of(component.getConstructors()).injectablePart().findFirst().orElseGet(() -> evaluate(component::getDeclaredConstructor).evaluate());
     }
 
     public Class<?>[] dependencyClasses() {
