@@ -77,6 +77,7 @@ public class InjectionTest {
         }
 
     }
+
     @Nested
     public class FieldInjection {
 
