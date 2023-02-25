@@ -235,7 +235,7 @@ class SubClassOverrideSuperClassWithInject extends SuperClassWithInjectMethod {
 
     @Inject
     @Override
-    public void injectDependency(Dependency dependency) {
+    public void inject(Dependency dependency) {
     }
 
 }
@@ -243,8 +243,8 @@ class SubClassOverrideSuperClassWithInject extends SuperClassWithInjectMethod {
 class SubClassOverrideSuperClassWithNoInject extends SuperClassWithInjectMethod {
 
     @Override
-    public void injectDependency(Dependency dependency) {
-        super.injectDependency(dependency);
+    public void inject(Dependency dependency) {
+        super.inject(dependency);
     }
 
 }
@@ -255,8 +255,11 @@ class SuperClassWithInjectMethod {
     private Dependency dependency;
 
     @Inject
-    public void injectDependency(Dependency dependency) {
+    public void inject(Dependency dependency) {
         this.dependency = dependency;
+    }
+
+    @Inject
     }
 
     public Dependency dependency() {
