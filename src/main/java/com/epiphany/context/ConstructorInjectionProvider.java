@@ -46,10 +46,11 @@ public final class ConstructorInjectionProvider<Type> implements Provider<Type> 
 
     @Override
     public List<Class<?>> dependencies() {
-        return Stream.concat(
+        return Stream.of(
             injectFields.stream().map(Field::getType),
+            injectMethods.stream().flatMap(m -> stream(m.getParameterTypes())),
             stream(injectConstructor.getParameters()).map(Parameter::getType)
-        ).collect(Collectors.toList());
+        ).flatMap(o -> o).collect(Collectors.toList());
     }
 
     private static <Type> List<Field> initInjectFields(Class<Type> component) {

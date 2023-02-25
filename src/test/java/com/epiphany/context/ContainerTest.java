@@ -169,6 +169,12 @@ public class ContainerTest {
                 assertSame(instance, injection.get().dependency());
             }
 
+            @Test
+            void should_inclue_dependencies_from_inject_method() {
+                ConstructorInjectionProvider<MethodInjectionWithDependency> provider = new ConstructorInjectionProvider<>(MethodInjectionWithDependency.class);
+                assertThat(provider.dependencies()).containsExactly(Dependency.class);
+            }
+
         }
 
     }
@@ -210,7 +216,7 @@ class MethodInjectionWithNoDependency {
 @SuppressWarnings("unused")
 class MethodInjectionWithDependency {
 
-    private @Inject Dependency dependency;
+    private Dependency dependency;
 
     @Inject
     private void injectDependency(Dependency dependency) {
