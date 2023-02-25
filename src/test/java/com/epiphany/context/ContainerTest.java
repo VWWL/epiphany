@@ -162,11 +162,11 @@ public class ContainerTest {
 
             @Test
             void should_inject_dependency_via_inject_method() {
-                Dependency instance = new Dependency() {};
-                config.bind(Dependency.class, instance);
+                Dependency dependency = new Dependency() {};
+                config.bind(Dependency.class, dependency);
                 config.bind(MethodInjectionWithDependency.class, MethodInjectionWithDependency.class);
                 Optional<MethodInjectionWithDependency> injection = config.context().get(MethodInjectionWithDependency.class);
-                assertSame(instance, injection.get().dependency());
+                assertSame(dependency, injection.get().dependency());
             }
 
             @Test
@@ -193,6 +193,15 @@ public class ContainerTest {
                 assertThat(provider.dependencies()).containsExactly(Dependency.class, Component.class);
             }
 
+            @Test
+            void should_only_call_once_if_subclass_override_inject_method_with_inject() {
+                Dependency dependency = new Dependency() {};
+                config.bind(Dependency.class, dependency);
+                config.bind(SubClassOverrideSuperClassWithInject.class, SubClassOverrideSuperClassWithInject.class);
+                SubClassOverrideSuperClassWithInject component = config.context().get(SubClassOverrideSuperClassWithInject.class).get();
+                assertNull(component.dependency());
+            }
+
         }
 
     }
@@ -215,13 +224,22 @@ interface Dependency {}
 
 interface NestedDependency {}
 
+class SubClassOverrideSuperClassWithInject extends SuperClassWithInjectMethod {
+
+    @Inject
+    @Override
+    public void injectDependency(Dependency dependency) {
+    }
+
+}
+
 @SuppressWarnings("unused")
 class SuperClassWithInjectMethod {
 
     private Dependency dependency;
 
     @Inject
-    private void injectDependency(Dependency dependency) {
+    public void injectDependency(Dependency dependency) {
         this.dependency = dependency;
     }
 

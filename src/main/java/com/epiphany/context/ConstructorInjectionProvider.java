@@ -67,7 +67,11 @@ public final class ConstructorInjectionProvider<Type> implements Provider<Type> 
         List<Method> injectMethods = new ArrayList<>();
         Class<?> current = component;
         while (current != Object.class) {
-            injectMethods.addAll(stream(current.getDeclaredMethods()).filter(o -> o.isAnnotationPresent(Inject.class)).toList());
+            List<Method> currentInjectMethods = stream(current.getDeclaredMethods())
+                .filter(o -> o.isAnnotationPresent(Inject.class))
+                .filter(o -> injectMethods.stream().noneMatch(m -> m.getName().equals(o.getName()) && Arrays.equals(m.getParameterTypes(), o.getParameterTypes())))
+                .toList();
+            injectMethods.addAll(currentInjectMethods);
             current = current.getSuperclass();
         }
         Collections.reverse(injectMethods);
