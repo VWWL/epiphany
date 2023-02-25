@@ -20,7 +20,6 @@ public final class InjectionProvider<Type> implements Provider<Type> {
         this.constructors = new InjectConstructor<>(component);
         this.injectFields = new Fields(component);
         this.injectMethods = initInjectMethods(component);
-        if (injectFields.injectFields.stream().anyMatch(o -> Modifier.isFinal(o.getModifiers()))) throw new IllegalComponentException();
         if (injectMethods.stream().anyMatch(o -> o.getTypeParameters().length != 0)) throw new IllegalComponentException();
     }
 
@@ -29,10 +28,7 @@ public final class InjectionProvider<Type> implements Provider<Type> {
     public Type get(final Context context) {
         return evaluate(() -> {
             Type instance = constructors.newInstance(context);
-            for (Field field : injectFields.injectFields) {
-                field.setAccessible(true);
-                field.set(instance, toDependency(context, field));
-            }
+            injectFields.injectInto(context, instance);
             for (Method method : injectMethods) {
                 method.setAccessible(true);
                 method.invoke(instance, toDependencies(context, method));
@@ -44,7 +40,7 @@ public final class InjectionProvider<Type> implements Provider<Type> {
     @Override
     public List<Class<?>> dependencies() {
         return Stream.of(
-            injectFields.injectFields.stream().map(Field::getType),
+            injectFields.get().stream().map(Field::getType),
             injectMethods.stream().flatMap(m -> stream(m.getParameterTypes())),
             stream(constructors.dependencyClasses())
         ).flatMap(o -> o).collect(Collectors.toList());

@@ -1,25 +1,36 @@
 package com.epiphany.context;
 
+import com.epiphany.context.exception.IllegalComponentException;
+
 import java.lang.reflect.*;
 import java.util.List;
-import java.util.stream.Stream;
 
+import static com.epiphany.general.Exceptions.*;
 import static java.util.Arrays.stream;
 
 public class Fields {
 
-    final List<Field> injectFields;
+    private final List<Field> impl;
 
     public <Type> Fields(Class<Type> component) {
-        this.injectFields = initInjectFields(component);
+        this.impl = new Traverser<Field>().traverse(component, (injectMethods1, current) -> stream(current.getDeclaredFields()).filter(o -> o.isAnnotationPresent(Inject.class)).toList());
+        if (impl.stream().anyMatch(o -> Modifier.isFinal(o.getModifiers()))) throw new IllegalComponentException();
     }
 
-    private static <Type> List<Field> initInjectFields(Class<Type> component) {
-        return new Traverser<Field>().traverse(component, (injectMethods1, current) -> injectableStream(current.getDeclaredFields()).toList());
+    public List<Field> get() {
+        return impl;
     }
 
-    private static <T extends AnnotatedElement> Stream<T> injectableStream(T[] declaredFields) {
-        return stream(declaredFields).filter(o -> o.isAnnotationPresent(Inject.class));
+    public <Type> void injectInto(Context context, Type instance) {
+        for (Field field : impl) {
+            field.setAccessible(true);
+            execute(() -> field.set(instance, toDependency(context, field))).run();
+        }
+    }
+
+    @SuppressWarnings("all")
+    private static Object toDependency(Context context, Field field) {
+        return context.get(field.getType()).get();
     }
 
 }
