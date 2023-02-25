@@ -57,10 +57,10 @@ public final class InjectionProvider<Type> implements Provider<Type> {
         ).flatMap(o -> o).collect(Collectors.toList());
     }
 
-    private <Type> void checkConstructor(final Class<Type> implementation) {
-        if (noConstructor(implementation)) return;
-        if (countOfInjectConstructors(implementation) > 1) throw new IllegalComponentException();
-        if (countOfInjectConstructors(implementation) == 0 && noDefaultConstructor(implementation)) throw new IllegalComponentException();
+    private <Type> void checkConstructor(final Class<Type> component) {
+        if (noConstructor(component)) return;
+        if (countOfInjectConstructors(component) > 1) throw new IllegalComponentException();
+        if (countOfInjectConstructors(component) == 0 && noDefaultConstructor(component)) throw new IllegalComponentException();
     }
 
     private <Type> boolean noConstructor(Class<Type> implementation) {
