@@ -254,6 +254,11 @@ public class ContainerTest {
 
             }
 
+            @Test
+            void should_throw_exception_if_inject_method_has_type_parameter() {
+                assertThrows(IllegalComponentException.class, () -> new ConstructorInjectionProvider<>(InjectMethodWithTypeParameter.class));
+            }
+
         }
 
     }
@@ -277,6 +282,15 @@ interface Dependency {}
 interface NestedDependency {}
 
 abstract class AbstractComponent implements Component {
+}
+
+@SuppressWarnings("unused")
+class InjectMethodWithTypeParameter {
+
+    @Inject
+    <T> void install() {
+    }
+
 }
 
 @SuppressWarnings("unused")
