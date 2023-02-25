@@ -143,7 +143,6 @@ public class ContainerTest {
             }
 
             @Test
-            @Disabled
             void should_throw_exception_when_field_with_cyclic_dependencies() {
                 config.bind(ComponentWithComponentInjection.class, ComponentWithComponentInjection.class);
                 assertThrows(CyclicDependenciesFoundException.class, () -> config.context());
