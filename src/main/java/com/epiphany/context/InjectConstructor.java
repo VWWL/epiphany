@@ -21,9 +21,12 @@ public class InjectConstructor<Type> {
     }
 
     @SuppressWarnings("all")
-    Type newInstance(Context context) {
+    public Type newInstance(Context context, InjectFields injectFields, InjectMethods injectMethods) {
         Object[] dependencies = stream(impl.getParameters()).map(Parameter::getType).map(context::get).map(Optional::get).toArray(Object[]::new);
-        return evaluate(() -> impl.newInstance(dependencies)).evaluate();
+        Type instance = evaluate(() -> impl.newInstance(dependencies)).evaluate();
+        injectFields.injectInto(context, instance);
+        injectMethods.injectInto(context, instance);
+        return instance;
     }
 
 }
