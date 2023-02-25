@@ -1,7 +1,5 @@
 package com.epiphany.context;
 
-import java.util.Optional;
-
 public final class ContextConfig {
 
     private final InjectionProviders injectionProviders;
@@ -19,14 +17,7 @@ public final class ContextConfig {
     }
 
     public Context context() {
-        injectionProviders.checkDependencies();
-        return new Context() {
-            @Override
-            @SuppressWarnings("unchecked")
-            public <Type> Optional<Type> get(Class<Type> type) {
-                return Optional.ofNullable(injectionProviders.providers().get(type)).map(provider -> provider.get(this)).map(o -> (Type) o);
-            }
-        };
+        return new GeneralContext(injectionProviders);
     }
 
 }
