@@ -160,6 +160,15 @@ public class ContainerTest {
                 assertEquals(1, injection.get().called());
             }
 
+            @Test
+            void should_inject_dependency_via_inject_method() {
+                Dependency instance = new Dependency() {};
+                config.bind(Dependency.class, instance);
+                config.bind(MethodInjectionWithDependency.class, MethodInjectionWithDependency.class);
+                Optional<MethodInjectionWithDependency> injection = config.context().get(MethodInjectionWithDependency.class);
+                assertSame(instance, injection.get().dependency());
+            }
+
         }
 
     }
@@ -188,12 +197,28 @@ class MethodInjectionWithNoDependency {
     private int called = 0;
 
     @Inject
-    void install() {
+    private void install() {
         called++;
     }
 
     public int called() {
         return called;
+    }
+
+}
+
+@SuppressWarnings("unused")
+class MethodInjectionWithDependency {
+
+    private @Inject Dependency dependency;
+
+    @Inject
+    private void injectDependency(Dependency dependency) {
+        this.dependency = dependency;
+    }
+
+    public Dependency dependency() {
+        return dependency;
     }
 
 }
