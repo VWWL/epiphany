@@ -107,10 +107,7 @@ public final class InjectionProvider<Type> implements Provider<Type> {
 
     @SuppressWarnings("unchecked")
     private static <Type> Constructor<Type> initInjectConstructor(Class<Type> component) {
-        return (Constructor<Type>) stream(component.getConstructors())
-            .filter(c -> c.isAnnotationPresent(Inject.class))
-            .findFirst()
-            .orElseGet(() -> evaluate(component::getDeclaredConstructor).evaluate());
+        return (Constructor<Type>) injectableStream(component.getConstructors()).findFirst().orElseGet(() -> evaluate(component::getDeclaredConstructor).evaluate());
     }
 
     private static <T extends AnnotatedElement> Stream<T> injectableStream(T[] declaredFields) {
