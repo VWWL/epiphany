@@ -16,6 +16,7 @@ public final class ConstructorInjectionProvider<Type> implements Provider<Type> 
     private final List<Method> injectMethods;
 
     public ConstructorInjectionProvider(final Class<Type> component) {
+        checkConstructor(component);
         if (Modifier.isAbstract(component.getModifiers())) throw new IllegalComponentException();
         this.injectConstructor = initInjectConstructor(component);
         this.injectFields = initInjectFields(component);
@@ -54,6 +55,28 @@ public final class ConstructorInjectionProvider<Type> implements Provider<Type> 
             injectMethods.stream().flatMap(m -> stream(m.getParameterTypes())),
             stream(injectConstructor.getParameters()).map(Parameter::getType)
         ).flatMap(o -> o).collect(Collectors.toList());
+    }
+
+    private <Type> void checkConstructor(final Class<Type> implementation) {
+        if (noConstructor(implementation)) return;
+        if (countOfInjectConstructors(implementation) > 1) throw new IllegalComponentException();
+        if (countOfInjectConstructors(implementation) == 0 && noDefaultConstructor(implementation)) throw new IllegalComponentException();
+    }
+
+    private <Type> boolean noConstructor(Class<Type> implementation) {
+        return stream(implementation.getConstructors()).findAny().isEmpty();
+    }
+
+    private <Type> boolean noDefaultConstructor(final Class<Type> implementation) {
+        return stream(implementation.getConstructors()).filter(this::noParams).findFirst().isEmpty();
+    }
+
+    private boolean noParams(final Constructor<?> constructor) {
+        return constructor.getParameters().length == 0;
+    }
+
+    private <Type> long countOfInjectConstructors(final Class<Type> implementation) {
+        return stream(implementation.getConstructors()).filter(c -> c.isAnnotationPresent(Inject.class)).count();
     }
 
     private static <Type> List<Field> initInjectFields(Class<Type> component) {
