@@ -75,16 +75,9 @@ public class ContainerTest {
 
             public static Stream<Arguments> should_throw_exception_if_dependency_not_found() {
                 return Stream.of(
-                    Arguments.of(Named.of("Inject Constructor", MissingDependencyConstructor.class))
+                    Arguments.of(Named.of("Inject Constructor", MissingDependencyConstructor.class)),
+                    Arguments.of(Named.of("Inject Field", MissingDependencyField.class))
                 );
-            }
-
-            @Test
-            void should_throw_when_dependency_is_not_found() {
-                config.bind(Component.class, ComponentWithInjectConstructor.class);
-                DependencyNotFoundException exception = assertThrows(DependencyNotFoundException.class, () -> config.context());
-                assertEquals(Dependency.class, exception.dependency());
-                assertEquals(Component.class, exception.component());
             }
 
             @Test
