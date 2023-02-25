@@ -28,8 +28,13 @@ public class InjectionProviders {
 
     @SuppressWarnings("unchecked")
     public <Type, Implementation extends Type> void register(Class<Type> type, ClassName className) {
-        Class<Implementation> implementation = (Class<Implementation>) evaluate(() -> Class.forName(className.className())).evaluate();
-        this.register(type, implementation);
+        try {
+            Class<Implementation> implementation = (Class<Implementation>) evaluate(() -> Class.forName(className.className())).evaluate();
+            if (!type.isAssignableFrom(implementation)) throw new IllegalComponentException();
+            this.register(type, implementation);
+        } catch (Exception e) {
+            throw new IllegalComponentException();
+        }
     }
 
     public void checkDependencies() {

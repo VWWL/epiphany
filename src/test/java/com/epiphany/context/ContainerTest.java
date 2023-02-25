@@ -158,6 +158,16 @@ public class ContainerTest {
                 assertDoesNotThrow(() -> config.context());
             }
 
+            @Test
+            void should_throw_exception_when_class_name_is_not_present() {
+                assertThrows(IllegalComponentException.class,() -> config.bind(Component.class, new ClassName("")));
+            }
+
+            @Test
+            void should_throw_exception_when_class_is_not_a_subtype_of_bind_class() {
+                assertThrows(IllegalComponentException.class,() -> config.bind(NestedDependency.class, new ClassName("com.epiphany.context.source.DependencyWithNestedDependency")));
+            }
+
         }
 
     }
