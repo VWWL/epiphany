@@ -32,7 +32,7 @@ public final class InjectionProvider<Type> implements Provider<Type> {
             Type instance = injectConstructor.newInstance(dependencies);
             for (Field field : injectFields) {
                 field.setAccessible(true);
-                field.set(instance, context.get(field.getType()).get());
+                field.set(instance, toDependency(context, field));
             }
             for (Method method : injectMethods) {
                 method.setAccessible(true);
@@ -110,6 +110,11 @@ public final class InjectionProvider<Type> implements Provider<Type> {
     @SuppressWarnings("unchecked")
     private static <Type> Constructor<Type> initInjectConstructor(Class<Type> component) {
         return (Constructor<Type>) injectableStream(component.getConstructors()).findFirst().orElseGet(() -> evaluate(component::getDeclaredConstructor).evaluate());
+    }
+
+    @SuppressWarnings("all")
+    private static Object toDependency(Context context, Field field) {
+        return context.get(field.getType()).get();
     }
 
     @SuppressWarnings("all")
