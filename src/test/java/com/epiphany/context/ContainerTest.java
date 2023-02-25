@@ -113,6 +113,11 @@ public class ContainerTest {
                 assertThat(exception.components()).containsExactlyInAnyOrder(Component.class, Dependency.class, NestedDependency.class);
             }
 
+            @Test
+            void should_throw_if_component_is_abstract() {
+                assertThrows(IllegalComponentException.class, () -> new ConstructorInjectionProvider<>(AbstractComponent.class));
+            }
+
         }
 
         @Nested
@@ -260,6 +265,9 @@ interface Component {}
 interface Dependency {}
 
 interface NestedDependency {}
+
+abstract class AbstractComponent implements Component {
+}
 
 @SuppressWarnings("unused")
 class CompareInjectMethodOverride {

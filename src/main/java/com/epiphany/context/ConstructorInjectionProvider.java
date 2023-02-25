@@ -16,6 +16,7 @@ public final class ConstructorInjectionProvider<Type> implements Provider<Type> 
     private final List<Method> injectMethods;
 
     public ConstructorInjectionProvider(final Class<Type> component) {
+        if (Modifier.isAbstract(component.getModifiers())) throw new IllegalComponentException();
         this.injectConstructor = initInjectConstructor(component);
         this.injectFields = initInjectFields(component);
         this.injectMethods = initInjectMethods(component);
