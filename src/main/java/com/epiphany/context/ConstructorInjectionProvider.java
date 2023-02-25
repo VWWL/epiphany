@@ -12,18 +12,15 @@ import static java.util.Arrays.stream;
 public final class ConstructorInjectionProvider<Type> implements Provider<Type> {
 
     private final Constructor<Type> injectConstructor;
-    private final List<Class<?>> dependencies;
+    private final List<Field> injectFields;
 
-    @SuppressWarnings("unchecked")
-    public ConstructorInjectionProvider(final Class<Type> implementation) {
-        this.injectConstructor = (Constructor<Type>) stream(implementation.getConstructors())
-            .filter(c -> c.isAnnotationPresent(Inject.class))
-            .findFirst()
-            .orElseGet(() -> evaluate(implementation::getConstructor).evaluate());
-        this.dependencies = stream(injectConstructor.getParameters()).map(Parameter::getType).collect(Collectors.toList());
+    public ConstructorInjectionProvider(final Class<Type> component) {
+        this.injectConstructor = initInjectConstructor(component);
+        this.injectFields = initInjectFields(component);
     }
 
     @Override
+    @SuppressWarnings("all")
     public Type get(final Context context) {
         Object[] dependencies = stream(injectConstructor.getParameters())
             .map(Parameter::getType)
@@ -31,12 +28,31 @@ public final class ConstructorInjectionProvider<Type> implements Provider<Type> 
             .filter(Optional::isPresent)
             .map(Optional::get)
             .toArray(Object[]::new);
-        return evaluate(() -> injectConstructor.newInstance(dependencies)).evaluate();
+        return evaluate(() -> {
+            Type instance = injectConstructor.newInstance(dependencies);
+            for (Field field : injectFields) {
+                field.setAccessible(true);
+                field.set(instance, context.get(field.getType()).get());
+            }
+            return instance;
+        }).evaluate();
     }
 
     @Override
     public List<Class<?>> dependencies() {
-        return dependencies;
+        return stream(injectConstructor.getParameters()).map(Parameter::getType).collect(Collectors.toList());
+    }
+
+    private static <Type> List<Field> initInjectFields(Class<Type> component) {
+        return stream(component.getDeclaredFields()).filter(o -> o.isAnnotationPresent(Inject.class)).collect(Collectors.toList());
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <Type> Constructor<Type> initInjectConstructor(Class<Type> component) {
+        return (Constructor<Type>) stream(component.getConstructors())
+            .filter(c -> c.isAnnotationPresent(Inject.class))
+            .findFirst()
+            .orElseGet(() -> evaluate(component::getDeclaredConstructor).evaluate());
     }
 
 }

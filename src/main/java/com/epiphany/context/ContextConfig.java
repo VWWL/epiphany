@@ -36,8 +36,13 @@ public final class ContextConfig {
     }
 
     private <Type> void checkConstructor(final Class<Type> implementation) {
+        if (noConstructor(implementation)) return;
         if (countOfInjectConstructors(implementation) > 1) throw new IllegalComponentException();
         if (countOfInjectConstructors(implementation) == 0 && noDefaultConstructor(implementation)) throw new IllegalComponentException();
+    }
+
+    private <Type> boolean noConstructor(Class<Type> implementation) {
+        return stream(implementation.getConstructors()).findAny().isEmpty();
     }
 
     private <Type> boolean noDefaultConstructor(final Class<Type> implementation) {

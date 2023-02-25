@@ -1,9 +1,7 @@
 package com.epiphany.context;
 
 import jakarta.inject.Inject;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.util.Optional;
 
@@ -25,8 +23,7 @@ public class ContainerTest {
 
         @Test
         void should_bind_type_to_a_specific_instance() {
-            Component instance = new Component() {
-            };
+            Component instance = new Component() {};
             config.bind(Component.class, instance);
             assertSame(instance, config.context().get(Component.class).get());
         }
@@ -50,8 +47,7 @@ public class ContainerTest {
 
             @Test
             void should_bind_type_to_a_inject_constructor() {
-                Dependency dependency = new Dependency() {
-                };
+                Dependency dependency = new Dependency() {};
                 config.bind(Component.class, ComponentWithInjectConstructor.class);
                 config.bind(Dependency.class, dependency);
                 Component instance = config.context().get(Component.class).get();
@@ -122,6 +118,29 @@ public class ContainerTest {
         @Nested
         public class FieldInjection {
 
+            @Test
+            void should_inject_dependency_via_field() {
+                Dependency dependency = new Dependency() {};
+                config.bind(Dependency.class, dependency);
+                config.bind(ComponentWithFieldInjection.class, ComponentWithFieldInjection.class);
+                ComponentWithFieldInjection component = config.context().get(ComponentWithFieldInjection.class).get();
+                assertSame(dependency, component.dependency());
+            }
+
+            @Test
+            @Disabled
+            void should_include_field_dependency_in_denpendencies() {
+                ConstructorInjectionProvider<ComponentWithFieldInjection> provider = new ConstructorInjectionProvider<>(ComponentWithFieldInjection.class);
+                assertThat(provider.dependencies()).containsExactly(Dependency.class);
+            }
+
+            @Test
+            @Disabled
+            void should_throw_exception_when_field_with_cyclic_dependencies() {
+                config.bind(ComponentWithComponentInjection.class, ComponentWithComponentInjection.class);
+                assertThrows(CyclicDependenciesFoundException.class, () -> config.context());
+            }
+
         }
 
         @Nested
@@ -143,13 +162,30 @@ public class ContainerTest {
 
 }
 
-interface Component {
+interface Component {}
+
+interface Dependency {}
+
+interface NestedDependency {}
+
+class ComponentWithFieldInjection {
+
+    private @Inject Dependency dependency;
+
+    public Dependency dependency() {
+        return dependency;
+    }
+
 }
 
-interface Dependency {
-}
+class ComponentWithComponentInjection {
 
-interface NestedDependency {
+    private @Inject ComponentWithComponentInjection component;
+
+    public ComponentWithComponentInjection component() {
+        return component;
+    }
+
 }
 
 class ComponentWithDefaultConstructor implements Component {
@@ -163,8 +199,7 @@ class ComponentWithInjectConstructor implements Component {
 
     private final Dependency dependency;
 
-    @Inject
-    public ComponentWithInjectConstructor(final Dependency dependency) {
+    public @Inject ComponentWithInjectConstructor(final Dependency dependency) {
         this.dependency = dependency;
     }
 
@@ -177,12 +212,10 @@ class ComponentWithInjectConstructor implements Component {
 @SuppressWarnings("unused")
 class ComponentWithMultiConstructorProvided implements Component {
 
-    @Inject
-    public ComponentWithMultiConstructorProvided(final String name, final Double value) {
+    public @Inject ComponentWithMultiConstructorProvided(final String name, final Double value) {
     }
 
-    @Inject
-    public ComponentWithMultiConstructorProvided(final String name) {
+    public @Inject ComponentWithMultiConstructorProvided(final String name) {
     }
 
 }
@@ -199,8 +232,7 @@ class DependencyWithInjectConstructor implements Dependency {
 
     private final String dependency;
 
-    @Inject
-    public DependencyWithInjectConstructor(final String dependency) {
+    public @Inject DependencyWithInjectConstructor(final String dependency) {
         this.dependency = dependency;
     }
 
@@ -213,8 +245,7 @@ class DependencyWithInjectConstructor implements Dependency {
 @SuppressWarnings("unused")
 class DependencyDependedOnComponent implements Dependency {
 
-    @Inject
-    public DependencyDependedOnComponent(final Component component) {
+    public @Inject DependencyDependedOnComponent(final Component component) {
     }
 
 }
@@ -222,8 +253,7 @@ class DependencyDependedOnComponent implements Dependency {
 @SuppressWarnings("unused")
 class DependencyWithNestedDependency implements Dependency {
 
-    @Inject
-    public DependencyWithNestedDependency(NestedDependency dependency) {
+    public @Inject DependencyWithNestedDependency(NestedDependency dependency) {
     }
 
 }
@@ -231,8 +261,7 @@ class DependencyWithNestedDependency implements Dependency {
 @SuppressWarnings("unused")
 class NestedDependencyOnComponent implements NestedDependency {
 
-    @Inject
-    public NestedDependencyOnComponent(final Component component) {
+    public @Inject NestedDependencyOnComponent(final Component component) {
     }
 
 }
