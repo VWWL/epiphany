@@ -119,47 +119,62 @@ public class InjectionTest {
     @Nested
     public class MethodInjection {
 
-        @Test
-        void should_call_inject_method_even_if_no_dependency_declared() {
-            MethodInjectionWithNoDependency component = new ConstructorInjectionProvider<>(MethodInjectionWithNoDependency.class).get(context);
-            assertEquals(1, component.called());
+        @Nested
+        class Injection {
+
+            @Test
+            void should_call_inject_method_even_if_no_dependency_declared() {
+                MethodInjectionWithNoDependency component = new ConstructorInjectionProvider<>(MethodInjectionWithNoDependency.class).get(context);
+                assertEquals(1, component.called());
+            }
+
+            @Test
+            void should_inject_dependency_via_inject_method() {
+                MethodInjectionWithDependency component = new ConstructorInjectionProvider<>(MethodInjectionWithDependency.class).get(context);
+                assertSame(dependency, component.dependency());
+            }
+
+            @Test
+            void should_inclue_dependencies_from_inject_method() {
+                ConstructorInjectionProvider<MethodInjectionWithDependency> provider = new ConstructorInjectionProvider<>(MethodInjectionWithDependency.class);
+                assertThat(provider.dependencies()).containsExactly(Dependency.class);
+            }
+
+            @Test
+            void should_inject_subclass_dependency_and_superclass_dependency() {
+                SubClassWithInjectMethod component = new ConstructorInjectionProvider<>(SubClassWithInjectMethod.class).get(context);
+                assertSame(componentInstance, component.component());
+                assertSame(dependency, component.dependency());
+            }
+
+            @Test
+            void should_inclue_dependencies_from_inject_method_and_super_class_inject_method_and_called_super_first() {
+                ConstructorInjectionProvider<SubClassWithInjectMethod> provider = new ConstructorInjectionProvider<>(SubClassWithInjectMethod.class);
+                assertThat(provider.dependencies()).containsExactly(Dependency.class, Component.class);
+            }
+
+            @Test
+            void should_only_call_once_if_subclass_override_inject_method_with_inject() {
+                SubClassOverrideSuperClassWithInject component = new ConstructorInjectionProvider<>(SubClassOverrideSuperClassWithInject.class).get(context);
+                assertNull(component.dependency());
+            }
+
+            @Test
+            void should_not_call_inject_method_if_override_with_no_inject() {
+                SubClassOverrideSuperClassWithNoInject component = new ConstructorInjectionProvider<>(SubClassOverrideSuperClassWithNoInject.class).get(context);
+                assertNull(component.dependency());
+            }
+
         }
 
-        @Test
-        void should_inject_dependency_via_inject_method() {
-            MethodInjectionWithDependency component = new ConstructorInjectionProvider<>(MethodInjectionWithDependency.class).get(context);
-            assertSame(dependency, component.dependency());
-        }
+        @Nested
+        class IllegalInjectionMethods {
 
-        @Test
-        void should_inclue_dependencies_from_inject_method() {
-            ConstructorInjectionProvider<MethodInjectionWithDependency> provider = new ConstructorInjectionProvider<>(MethodInjectionWithDependency.class);
-            assertThat(provider.dependencies()).containsExactly(Dependency.class);
-        }
+            @Test
+            void should_throw_exception_if_inject_method_has_type_parameter() {
+                assertThrows(IllegalComponentException.class, () -> new ConstructorInjectionProvider<>(InjectMethodWithTypeParameter.class));
+            }
 
-        @Test
-        void should_inject_subclass_dependency_and_superclass_dependency() {
-            SubClassWithInjectMethod component = new ConstructorInjectionProvider<>(SubClassWithInjectMethod.class).get(context);
-            assertSame(componentInstance, component.component());
-            assertSame(dependency, component.dependency());
-        }
-
-        @Test
-        void should_inclue_dependencies_from_inject_method_and_super_class_inject_method_and_called_super_first() {
-            ConstructorInjectionProvider<SubClassWithInjectMethod> provider = new ConstructorInjectionProvider<>(SubClassWithInjectMethod.class);
-            assertThat(provider.dependencies()).containsExactly(Dependency.class, Component.class);
-        }
-
-        @Test
-        void should_only_call_once_if_subclass_override_inject_method_with_inject() {
-            SubClassOverrideSuperClassWithInject component = new ConstructorInjectionProvider<>(SubClassOverrideSuperClassWithInject.class).get(context);
-            assertNull(component.dependency());
-        }
-
-        @Test
-        void should_not_call_inject_method_if_override_with_no_inject() {
-            SubClassOverrideSuperClassWithNoInject component = new ConstructorInjectionProvider<>(SubClassOverrideSuperClassWithNoInject.class).get(context);
-            assertNull(component.dependency());
         }
 
         @Nested
@@ -187,11 +202,6 @@ public class InjectionTest {
                 assertEquals(1, component.methodWithParametersNotSame());
             }
 
-        }
-
-        @Test
-        void should_throw_exception_if_inject_method_has_type_parameter() {
-            assertThrows(IllegalComponentException.class, () -> new ConstructorInjectionProvider<>(InjectMethodWithTypeParameter.class));
         }
 
     }
