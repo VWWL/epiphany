@@ -13,13 +13,13 @@ import static java.util.Arrays.stream;
 
 public final class InjectionProvider<Type> implements Provider<Type> {
 
-    private final Constructors<Type> constructors;
+    private final InjectConstructor<Type> constructors;
     private final List<Field> injectFields;
     private final List<Method> injectMethods;
 
     public InjectionProvider(final Class<Type> component) {
         checkConstructor(component);
-        this.constructors = new Constructors<>(component);
+        this.constructors = new InjectConstructor<>(component);
         this.injectFields = initInjectFields(component);
         this.injectMethods = initInjectMethods(component);
         if (injectFields.stream().anyMatch(o -> Modifier.isFinal(o.getModifiers()))) throw new IllegalComponentException();
@@ -29,7 +29,7 @@ public final class InjectionProvider<Type> implements Provider<Type> {
     @Override
     @SuppressWarnings("all")
     public Type get(final Context context) {
-        Object[] dependencies = toDependencies(context, constructors.get());
+        Object[] dependencies = constructors.dependencies(context);
         return evaluate(() -> {
             Type instance = constructors.get().newInstance(dependencies);
             for (Field field : injectFields) {
@@ -49,7 +49,7 @@ public final class InjectionProvider<Type> implements Provider<Type> {
         return Stream.of(
             injectFields.stream().map(Field::getType),
             injectMethods.stream().flatMap(m -> stream(m.getParameterTypes())),
-            stream(constructors.get().getParameterTypes())
+            stream(constructors.dependencyClasses())
         ).flatMap(o -> o).collect(Collectors.toList());
     }
 
