@@ -55,13 +55,8 @@ public final class InjectionProvider<Type> implements Provider<Type> {
 
     private <Type> void checkConstructor(final Class<Type> component) {
         if (Modifier.isAbstract(component.getModifiers())) throw new IllegalComponentException();
-        if (noConstructor(component)) return;
         if (countOfInjectConstructors(component) > 1) throw new IllegalComponentException();
         if (countOfInjectConstructors(component) == 0 && noDefaultConstructor(component)) throw new IllegalComponentException();
-    }
-
-    private <Type> boolean noConstructor(Class<Type> implementation) {
-        return stream(implementation.getConstructors()).findAny().isEmpty();
     }
 
     private <Type> boolean noDefaultConstructor(final Class<Type> implementation) {

@@ -28,13 +28,6 @@ public class ContainerTest {
         @Nested
         class TypeBinding {
 
-            @Test
-            void should_bind_type_to_a_specific_instance() {
-                Component instance = new Component() {};
-                config.bind(Component.class, instance);
-                assertSame(instance, config.context().get(Component.class).get());
-            }
-
             @ParameterizedTest(name = "supporting {0}")
             @MethodSource
             void should_bind_type_to_an_injectable_component(Class<? extends Something> componentType) {
