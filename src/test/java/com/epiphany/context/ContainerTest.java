@@ -5,7 +5,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -79,6 +79,36 @@ public class ContainerTest {
                     Arguments.of(Named.of("Inject Field", MissingDependencyField.class)),
                     Arguments.of(Named.of("Inject Method", MissingDependencyMethod.class))
                 );
+            }
+
+            @ParameterizedTest(name = "cyclic dependency between {0} and {1}")
+            @MethodSource
+            void should_throw_exception_if_cyclic_dependencies_found(Class<? extends Component> component, Class<? extends Dependency> dependency) {
+                config.bind(Component.class, component);
+                config.bind(Dependency.class, dependency);
+                CyclicDependenciesFoundException exception = assertThrows(CyclicDependenciesFoundException.class, () -> config.context());
+                Set<Class<?>> classes = exception.components();
+                assertEquals(2, classes.size());
+                assertTrue(classes.contains(Component.class));
+                assertTrue(classes.contains(Dependency.class));
+            }
+
+            public static Stream<Arguments> should_throw_exception_if_cyclic_dependencies_found() {
+                List<Arguments> arguments = new ArrayList<>();
+                for (Named component : List.of(
+                    Named.of("Inject Constructor", CyclicComponentInjectConstructor.class),
+                    Named.of("Inject Field", CyclicComponentInjectField.class),
+                    Named.of("Inject Method", CyclicComponentInjectMethod.class))
+                ) {
+                    for (Named dependency : List.of(
+                        Named.of("Inject Constructor", CyclicDependencyInjectMethod.class),
+                        Named.of("Inject Field", CyclicDependencyInjectField.class),
+                        Named.of("Inject Method", CyclicDependencyInjectMethod.class)
+                    )) {
+                        arguments.add(Arguments.of(component, dependency));
+                    }
+                }
+                return arguments.stream();
             }
 
             @Test
