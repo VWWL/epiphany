@@ -81,27 +81,37 @@ public class InjectionTest {
     @Nested
     public class FieldInjection {
 
-        @Test
-        void should_inject_dependency_via_field() {
-            ComponentWithFieldInjection component = new ConstructorInjectionProvider<>(ComponentWithFieldInjection.class).get(context);
-            assertSame(dependency, component.dependency());
+        @Nested
+        class Injection {
+
+            @Test
+            void should_inject_dependency_via_field() {
+                ComponentWithFieldInjection component = new ConstructorInjectionProvider<>(ComponentWithFieldInjection.class).get(context);
+                assertSame(dependency, component.dependency());
+            }
+
+            @Test
+            void should_inject_subclass_dependency_via_field() {
+                ComponentWithFieldInjection component = new ConstructorInjectionProvider<>(SubclassWithComponentWithFieldInjection.class).get(context);
+                assertSame(dependency, component.dependency());
+            }
+
+            @Test
+            void should_include_field_dependency_in_denpendencies() {
+                ConstructorInjectionProvider<ComponentWithFieldInjection> provider = new ConstructorInjectionProvider<>(ComponentWithFieldInjection.class);
+                assertThat(provider.dependencies()).containsExactly(Dependency.class);
+            }
+
         }
 
-        @Test
-        void should_inject_subclass_dependency_via_field() {
-            ComponentWithFieldInjection component = new ConstructorInjectionProvider<>(SubclassWithComponentWithFieldInjection.class).get(context);
-            assertSame(dependency, component.dependency());
-        }
+        @Nested
+        class IllegalInjectField {
 
-        @Test
-        void should_include_field_dependency_in_denpendencies() {
-            ConstructorInjectionProvider<ComponentWithFieldInjection> provider = new ConstructorInjectionProvider<>(ComponentWithFieldInjection.class);
-            assertThat(provider.dependencies()).containsExactly(Dependency.class);
-        }
+            @Test
+            void should_throw_exception_when_inject_field_is_final() {
+                assertThrows(IllegalComponentException.class, () -> new ConstructorInjectionProvider<>(FinalInjectField.class));
+            }
 
-        @Test
-        void should_throw_exception_when_inject_field_is_final() {
-            assertThrows(IllegalComponentException.class, () -> new ConstructorInjectionProvider<>(FinalInjectField.class));
         }
 
     }
