@@ -83,7 +83,7 @@ public final class InjectionProvider<Type> implements Provider<Type> {
         List<Field> injectFields = new ArrayList<>();
         Class<?> current = component;
         while (current != Object.class) {
-            injectFields.addAll(stream(current.getDeclaredFields()).filter(o -> o.isAnnotationPresent(Inject.class)).toList());
+            injectFields.addAll(injectableStream(current.getDeclaredFields()).toList());
             current = current.getSuperclass();
         }
         return injectFields;
@@ -111,6 +111,10 @@ public final class InjectionProvider<Type> implements Provider<Type> {
             .filter(c -> c.isAnnotationPresent(Inject.class))
             .findFirst()
             .orElseGet(() -> evaluate(component::getDeclaredConstructor).evaluate());
+    }
+
+    private static <T extends AnnotatedElement> Stream<T> injectableStream(T[] declaredFields) {
+        return stream(declaredFields).filter(o -> o.isAnnotationPresent(Inject.class));
     }
 
 }
