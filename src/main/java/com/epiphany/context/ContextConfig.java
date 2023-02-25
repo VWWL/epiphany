@@ -29,9 +29,14 @@ public class ContextConfig {
         providers.put(type, new ConstructorInjectionProvider<>(type, implementation));
     }
 
-    @SuppressWarnings("unchecked")
-    public <Type> Optional<Type> get(final Class<Type> type) {
-        return Optional.ofNullable(providers.get(type)).map(Provider::get).map(o -> (Type) o);
+    public Context context() {
+        return new Context() {
+            @Override
+            @SuppressWarnings("unchecked")
+            public <Type> Optional<Type> get(Class<Type> type) {
+                return Optional.ofNullable(providers.get(type)).map(Provider::get).map(o -> (Type) o);
+            }
+        };
     }
 
     private <Type> void check(final Class<Type> implementation) {
@@ -84,7 +89,7 @@ public class ContextConfig {
             Constructor<Type> injectConstructor = injectConstructor(implementation);
             Object[] dependencies = stream(injectConstructor.getParameters())
                     .map(Parameter::getType)
-                    .map(type -> ContextConfig.this.get(type).orElseThrow(() -> new DependencyNotFoundException(type, componentType)))
+                    .map(type -> context().get(type).orElseThrow(() -> new DependencyNotFoundException(type, componentType)))
                     .toArray(Object[]::new);
             return evaluate(() -> injectConstructor.newInstance(dependencies)).evaluate();
         }
