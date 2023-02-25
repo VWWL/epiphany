@@ -9,13 +9,13 @@ import java.util.stream.*;
 import static com.epiphany.general.Exceptions.evaluate;
 import static java.util.Arrays.stream;
 
-public final class ConstructorInjectionProvider<Type> implements Provider<Type> {
+public final class InjectionProvider<Type> implements Provider<Type> {
 
     private final Constructor<Type> injectConstructor;
     private final List<Field> injectFields;
     private final List<Method> injectMethods;
 
-    public ConstructorInjectionProvider(final Class<Type> component) {
+    public InjectionProvider(final Class<Type> component) {
         checkConstructor(component);
         if (Modifier.isAbstract(component.getModifiers())) throw new IllegalComponentException();
         this.injectConstructor = initInjectConstructor(component);

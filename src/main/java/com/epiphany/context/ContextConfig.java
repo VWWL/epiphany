@@ -15,7 +15,7 @@ public final class ContextConfig {
     }
 
     public <Type, Implementation extends Type> void bind(final Class<Type> type, final Class<Implementation> implementation) {
-        providers.put(type, new ConstructorInjectionProvider<>(implementation));
+        providers.put(type, new InjectionProvider<>(implementation));
     }
 
     public Context context() {
