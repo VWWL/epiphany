@@ -185,13 +185,10 @@ class ComponentWithFieldInjection {
 
 }
 
+@SuppressWarnings("unused")
 class ComponentWithComponentInjection {
 
     private @Inject ComponentWithComponentInjection component;
-
-    public ComponentWithComponentInjection component() {
-        return component;
-    }
 
 }
 
