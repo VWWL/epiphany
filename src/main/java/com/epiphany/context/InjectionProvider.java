@@ -94,14 +94,22 @@ public final class InjectionProvider<Type> implements Provider<Type> {
         Class<?> current = component;
         while (current != Object.class) {
             List<Method> currentInjectMethods = injectableStream(current.getDeclaredMethods())
-                .filter(o -> injectMethods.stream().noneMatch(m -> isOverride(o, m)))
-                .filter(o -> uninjectableStream(component.getDeclaredMethods()).noneMatch(m -> isOverride(o, m)))
+                .filter(o -> isOverrideByInjectMethod(injectMethods, o))
+                .filter(o -> isOverrideByNoInjectMethod(component, o))
                 .toList();
             injectMethods.addAll(currentInjectMethods);
             current = current.getSuperclass();
         }
         Collections.reverse(injectMethods);
         return injectMethods;
+    }
+
+    private static <Type> boolean isOverrideByNoInjectMethod(Class<Type> component, Method method) {
+        return uninjectableStream(component.getDeclaredMethods()).noneMatch(m -> isOverride(method, m));
+    }
+
+    private static boolean isOverrideByInjectMethod(List<Method> injectMethods, Method method) {
+        return injectMethods.stream().noneMatch(m -> isOverride(method, m));
     }
 
     @SuppressWarnings("unchecked")
