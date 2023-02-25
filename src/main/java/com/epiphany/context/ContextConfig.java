@@ -1,7 +1,6 @@
 package com.epiphany.context;
 
 import jakarta.inject.Inject;
-import jakarta.inject.Provider;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
@@ -21,7 +20,7 @@ public class ContextConfig {
     }
 
     public <Type> void bind(final Class<Type> type, final Type instance) {
-        providers.put(type, () -> instance);
+        providers.put(type, context -> instance);
     }
 
     public <Type, Implementation extends Type> void bind(final Class<Type> type, final Class<Implementation> implementation) {
@@ -34,7 +33,7 @@ public class ContextConfig {
             @Override
             @SuppressWarnings("unchecked")
             public <Type> Optional<Type> get(Class<Type> type) {
-                return Optional.ofNullable(providers.get(type)).map(Provider::get).map(o -> (Type) o);
+                return Optional.ofNullable(providers.get(type)).map(provider -> provider.get(this)).map(o -> (Type) o);
             }
         };
     }
@@ -73,11 +72,11 @@ public class ContextConfig {
         }
 
         @Override
-        public Type get() {
+        public Type get(Context context) {
             if (constructing) throw new CyclicDependenciesFoundException(componentType);
             try {
                 constructing();
-                return createInstanceByInjectOrDefaultConstructor();
+                return createInstanceByInjectOrDefaultConstructor(context);
             } catch (CyclicDependenciesFoundException e) {
                 throw new CyclicDependenciesFoundException(componentType, e);
             } finally {
@@ -85,11 +84,11 @@ public class ContextConfig {
             }
         }
 
-        private Type createInstanceByInjectOrDefaultConstructor() {
+        private Type createInstanceByInjectOrDefaultConstructor(Context context) {
             Constructor<Type> injectConstructor = injectConstructor(implementation);
             Object[] dependencies = stream(injectConstructor.getParameters())
                     .map(Parameter::getType)
-                    .map(type -> context().get(type).orElseThrow(() -> new DependencyNotFoundException(type, componentType)))
+                    .map(type -> context.get(type).orElseThrow(() -> new DependencyNotFoundException(type, componentType)))
                     .toArray(Object[]::new);
             return evaluate(() -> injectConstructor.newInstance(dependencies)).evaluate();
         }
