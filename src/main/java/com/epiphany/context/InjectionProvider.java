@@ -95,7 +95,7 @@ public final class InjectionProvider<Type> implements Provider<Type> {
         while (current != Object.class) {
             List<Method> currentInjectMethods = injectableStream(current.getDeclaredMethods())
                 .filter(o -> injectMethods.stream().noneMatch(m -> m.getName().equals(o.getName()) && Arrays.equals(m.getParameterTypes(), o.getParameterTypes())))
-                .filter(o -> stream(component.getDeclaredMethods()).filter(m -> !m.isAnnotationPresent(Inject.class)).noneMatch(m -> m.getName().equals(o.getName()) && Arrays.equals(m.getParameterTypes(), o.getParameterTypes())))
+                .filter(o -> injectableStream(component.getDeclaredMethods()).noneMatch(m -> m.getName().equals(o.getName()) && Arrays.equals(m.getParameterTypes(), o.getParameterTypes())))
                 .toList();
             injectMethods.addAll(currentInjectMethods);
             current = current.getSuperclass();
