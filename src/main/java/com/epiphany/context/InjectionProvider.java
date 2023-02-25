@@ -29,9 +29,8 @@ public final class InjectionProvider<Type> implements Provider<Type> {
     @Override
     @SuppressWarnings("all")
     public Type get(final Context context) {
-        Object[] dependencies = constructors.dependencies(context);
         return evaluate(() -> {
-            Type instance = constructors.get().newInstance(dependencies);
+            Type instance = constructors.newInstance(context);
             for (Field field : injectFields) {
                 field.setAccessible(true);
                 field.set(instance, toDependency(context, field));
