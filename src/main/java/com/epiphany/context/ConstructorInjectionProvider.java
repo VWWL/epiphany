@@ -20,6 +20,7 @@ public final class ConstructorInjectionProvider<Type> implements Provider<Type> 
         this.injectConstructor = initInjectConstructor(component);
         this.injectFields = initInjectFields(component);
         this.injectMethods = initInjectMethods(component);
+        if (injectFields.stream().anyMatch(o -> Modifier.isFinal(o.getModifiers()))) throw new IllegalComponentException();
     }
 
     @Override

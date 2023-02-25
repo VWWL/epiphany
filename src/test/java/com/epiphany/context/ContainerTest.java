@@ -158,6 +158,11 @@ public class ContainerTest {
                 assertThrows(CyclicDependenciesFoundException.class, () -> config.context());
             }
 
+            @Test
+            void should_throw_exception_when_inject_field_is_final() {
+                assertThrows(IllegalComponentException.class, () -> new ConstructorInjectionProvider<>(FinalInjectField.class));
+            }
+
         }
 
         @Nested
@@ -272,6 +277,13 @@ interface Dependency {}
 interface NestedDependency {}
 
 abstract class AbstractComponent implements Component {
+}
+
+@SuppressWarnings("unused")
+class FinalInjectField {
+
+    final @Inject Dependency dependency = null;
+
 }
 
 @SuppressWarnings("unused")
