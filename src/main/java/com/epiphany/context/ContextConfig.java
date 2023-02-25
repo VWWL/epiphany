@@ -5,8 +5,10 @@ import jakarta.inject.Inject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.epiphany.general.Exceptions.evaluate;
@@ -14,21 +16,30 @@ import static java.util.Arrays.stream;
 
 public class ContextConfig {
     private final Map<Class<?>, Provider<?>> providers;
+    private final Map<Class<?>, List<Class<?>>> dependencies;
 
     public ContextConfig() {
         this.providers = new HashMap<>();
+        this.dependencies = new HashMap<>();
     }
 
     public <Type> void bind(final Class<Type> type, final Type instance) {
         providers.put(type, context -> instance);
+        dependencies.put(type, List.of());
     }
 
     public <Type, Implementation extends Type> void bind(final Class<Type> type, final Class<Implementation> implementation) {
         check(implementation);
         providers.put(type, new ConstructorInjectionProvider<>(type, implementation));
+        dependencies.put(type, stream(injectConstructor(implementation).getParameters()).map(Parameter::getType).collect(Collectors.toList()));
     }
 
     public Context context() {
+        for (Class<?> component : dependencies.keySet()) {
+            for (Class<?> dependency : dependencies.get(component)) {
+                if (!dependencies.containsKey(dependency)) throw new DependencyNotFoundException(dependency, component);
+            }
+        }
         return new Context() {
             @Override
             @SuppressWarnings("unchecked")
@@ -88,7 +99,9 @@ public class ContextConfig {
             Constructor<Type> injectConstructor = injectConstructor(implementation);
             Object[] dependencies = stream(injectConstructor.getParameters())
                     .map(Parameter::getType)
-                    .map(type -> context.get(type).orElseThrow(() -> new DependencyNotFoundException(type, componentType)))
+                    .map(context::get)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
                     .toArray(Object[]::new);
             return evaluate(() -> injectConstructor.newInstance(dependencies)).evaluate();
         }
