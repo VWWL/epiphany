@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import static com.epiphany.general.Exceptions.evaluate;
 import static java.util.Arrays.stream;
 
-class ConstructorInjectionProvider<Type> implements Provider<Type> {
+public final class ConstructorInjectionProvider<Type> implements Provider<Type> {
 
     private final Constructor<Type> injectConstructor;
     private final List<Class<?>> dependencies;

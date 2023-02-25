@@ -7,7 +7,7 @@ import java.util.*;
 
 import static java.util.Arrays.stream;
 
-public class ContextConfig {
+public final class ContextConfig {
 
     private final Map<Class<?>, Provider<?>> providers;
 

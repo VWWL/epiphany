@@ -1,6 +1,6 @@
 package com.epiphany.context;
 
-public class DependencyNotFoundException extends RuntimeException {
+public final class DependencyNotFoundException extends RuntimeException {
     private final Class<?> dependency;
     private final Class<?> component;
 

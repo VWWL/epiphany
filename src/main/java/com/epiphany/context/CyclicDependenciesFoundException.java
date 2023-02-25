@@ -2,7 +2,7 @@ package com.epiphany.context;
 
 import java.util.*;
 
-public class CyclicDependenciesFoundException extends RuntimeException {
+public final class CyclicDependenciesFoundException extends RuntimeException {
 
     private final Set<Class<?>> components;
 
