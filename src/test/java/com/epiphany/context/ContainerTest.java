@@ -118,6 +118,11 @@ public class ContainerTest {
                 assertThrows(IllegalComponentException.class, () -> new ConstructorInjectionProvider<>(AbstractComponent.class));
             }
 
+            @Test
+            void should_throw_if_component_is_interface() {
+                assertThrows(IllegalComponentException.class, () -> new ConstructorInjectionProvider<>(Component.class));
+            }
+
         }
 
         @Nested
