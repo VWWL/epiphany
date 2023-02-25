@@ -17,4 +17,4 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       - name: Run integration tests
-        run: ./gradlew clean test
+        run: ./gradlew --parallel --warning-mode none -P chainTests clean check --no-build-cache
