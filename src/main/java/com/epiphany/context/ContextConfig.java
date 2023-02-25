@@ -6,34 +6,34 @@ import java.util.*;
 
 public final class ContextConfig {
 
-    private final Map<Class<?>, Provider<?>> providers;
+    private final InjectionProviders injectionProviders;
 
     public ContextConfig() {
-        this.providers = new HashMap<>();
+        this.injectionProviders = new InjectionProviders();
     }
 
     public <Type> void bind(final Class<Type> type, final Type instance) {
-        providers.put(type, context -> instance);
+        injectionProviders.providers().put(type, context -> instance);
     }
 
     public <Type, Implementation extends Type> void bind(final Class<Type> type, final Class<Implementation> implementation) {
-        providers.put(type, new InjectionProvider<>(implementation));
+        injectionProviders.providers().put(type, new InjectionProvider<>(implementation));
     }
 
     public Context context() {
-        providers.keySet().forEach(component -> checkDependencies(component, new Stack<>()));
+        injectionProviders.providers().keySet().forEach(component -> checkDependencies(component, new Stack<>()));
         return new Context() {
             @Override
             @SuppressWarnings("unchecked")
             public <Type> Optional<Type> get(Class<Type> type) {
-                return Optional.ofNullable(providers.get(type)).map(provider -> provider.get(this)).map(o -> (Type) o);
+                return Optional.ofNullable(injectionProviders.providers().get(type)).map(provider -> provider.get(this)).map(o -> (Type) o);
             }
         };
     }
 
     private void checkDependencies(final Class<?> component, final Stack<Class<?>> visiting) {
-        for (Class<?> dependency : providers.get(component).dependencies()) {
-            if (!providers.containsKey(dependency)) throw new DependencyNotFoundException(dependency, component);
+        for (Class<?> dependency : injectionProviders.providers().get(component).dependencies()) {
+            if (!injectionProviders.providers().containsKey(dependency)) throw new DependencyNotFoundException(dependency, component);
             if (visiting.contains(dependency)) throw new CyclicDependenciesFoundException(visiting);
             visiting.push(dependency);
             checkDependencies(dependency, visiting);
