@@ -27,12 +27,7 @@ public final class InjectionProvider<Type> implements Provider<Type> {
     @Override
     @SuppressWarnings("all")
     public Type get(final Context context) {
-        Object[] dependencies = stream(injectConstructor.getParameters())
-            .map(Parameter::getType)
-            .map(context::get)
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .toArray(Object[]::new);
+        Object[] dependencies = toDependencies(context, injectConstructor);
         return evaluate(() -> {
             Type instance = injectConstructor.newInstance(dependencies);
             for (Field field : injectFields) {
@@ -41,10 +36,15 @@ public final class InjectionProvider<Type> implements Provider<Type> {
             }
             for (Method method : injectMethods) {
                 method.setAccessible(true);
-                method.invoke(instance, stream(method.getParameterTypes()).map(t -> context.get(t)).map(o -> o.get()).toArray(Object[]::new));
+                method.invoke(instance, toDependencies(context, method));
             }
             return instance;
         }).evaluate();
+    }
+
+    @SuppressWarnings("all")
+    public Object[] toDependencies(Context context, Executable executable) {
+        return stream(executable.getParameters()).map(Parameter::getType).map(context::get).map(Optional::get).toArray(Object[]::new);
     }
 
     @Override
