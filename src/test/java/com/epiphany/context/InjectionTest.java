@@ -28,42 +28,52 @@ public class InjectionTest {
     @Nested
     public class ConstructorInjection {
 
-        @Test
-        void should_bind_class_to_a_default_constructor() {
-            ComponentWithDefaultConstructor instance = new ConstructorInjectionProvider<>(ComponentWithDefaultConstructor.class).get(context);
-            assertNotNull(instance);
+        @Nested
+        class Injection {
+
+            @Test
+            void should_call_default_constructor_if_no_inject_constructor() {
+                ComponentWithDefaultConstructor instance = new ConstructorInjectionProvider<>(ComponentWithDefaultConstructor.class).get(context);
+                assertNotNull(instance);
+            }
+
+            @Test
+            void should_inject_dependency_via_injected_constructor() {
+                ComponentWithInjectConstructor instance = new ConstructorInjectionProvider<>(ComponentWithInjectConstructor.class).get(context);
+                assertNotNull(instance);
+            }
+
+            @Test
+            void should_include_dependency_from_inject_constructor() {
+                ConstructorInjectionProvider<ComponentWithInjectConstructor> provider = new ConstructorInjectionProvider<>(ComponentWithInjectConstructor.class);
+                assertThat(provider.dependencies()).containsExactly(Dependency.class);
+            }
+
         }
 
-        @Test
-        void should_bind_type_to_a_inject_constructor() {
-            ComponentWithInjectConstructor instance = new ConstructorInjectionProvider<>(ComponentWithInjectConstructor.class).get(context);
-            assertNotNull(instance);
-        }
+        @Nested
+        class IllegalInjectConstructor {
 
-        @Test
-        void should_throw_when_multi_inject_constructors_provided() {
-            assertThrows(IllegalComponentException.class, () -> new ConstructorInjectionProvider<>(ComponentWithMultiConstructorProvided.class));
-        }
+            @Test
+            void should_throw_when_multi_inject_constructors_provided() {
+                assertThrows(IllegalComponentException.class, () -> new ConstructorInjectionProvider<>(ComponentWithMultiConstructorProvided.class));
+            }
 
-        @Test
-        void should_throw_when_no_inject_or_default_constructor_provided() {
-            assertThrows(IllegalComponentException.class, () -> new ConstructorInjectionProvider<>(ComponentWithNoInjectAndDefaultConstructorProvided.class));
-        }
+            @Test
+            void should_throw_when_no_inject_or_default_constructor_provided() {
+                assertThrows(IllegalComponentException.class, () -> new ConstructorInjectionProvider<>(ComponentWithNoInjectAndDefaultConstructorProvided.class));
+            }
 
-        @Test
-        void should_throw_if_component_is_abstract() {
-            assertThrows(IllegalComponentException.class, () -> new ConstructorInjectionProvider<>(AbstractComponent.class));
-        }
+            @Test
+            void should_throw_if_component_is_abstract() {
+                assertThrows(IllegalComponentException.class, () -> new ConstructorInjectionProvider<>(AbstractComponent.class));
+            }
 
-        @Test
-        void should_throw_if_component_is_interface() {
-            assertThrows(IllegalComponentException.class, () -> new ConstructorInjectionProvider<>(Component.class));
-        }
+            @Test
+            void should_throw_if_component_is_interface() {
+                assertThrows(IllegalComponentException.class, () -> new ConstructorInjectionProvider<>(Component.class));
+            }
 
-        @Test
-        void should_include_dependency_from_inject_constructor() {
-            ConstructorInjectionProvider<ComponentWithInjectConstructor> provider = new ConstructorInjectionProvider<>(ComponentWithInjectConstructor.class);
-            assertThat(provider.dependencies()).containsExactly(Dependency.class);
         }
 
     }
@@ -125,7 +135,7 @@ public class InjectionTest {
         }
 
         @Test
-        void inclue_dependencies_from_inject_method_and_super_class_inject_method_and_called_super_first() {
+        void should_inclue_dependencies_from_inject_method_and_super_class_inject_method_and_called_super_first() {
             ConstructorInjectionProvider<SubClassWithInjectMethod> provider = new ConstructorInjectionProvider<>(SubClassWithInjectMethod.class);
             assertThat(provider.dependencies()).containsExactly(Dependency.class, Component.class);
         }
