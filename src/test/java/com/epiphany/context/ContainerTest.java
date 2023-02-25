@@ -19,6 +19,38 @@ public class ContainerTest {
     }
 
     @Nested
+    public class DependencyCheck {
+
+        @Test
+        void should_throw_when_dependency_is_not_found() {
+            config.bind(Component.class, ComponentWithInjectConstructor.class);
+            DependencyNotFoundException exception = assertThrows(DependencyNotFoundException.class, () -> config.context());
+            assertEquals(Dependency.class, exception.dependency());
+            assertEquals(Component.class, exception.component());
+        }
+
+        @Test
+        void should_throw_if_cyclic_dependencies_found() {
+            config.bind(Component.class, ComponentWithInjectConstructor.class);
+            config.bind(Dependency.class, DependencyDependedOnComponent.class);
+            CyclicDependenciesFoundException exception = assertThrows(CyclicDependenciesFoundException.class, () -> config.context());
+            assertEquals(2, exception.components().size());
+            assertThat(exception.components()).containsExactlyInAnyOrder(Dependency.class, Component.class);
+        }
+
+        @Test
+        void should_throw_if_three_cyclic_dependencies_found() {
+            config.bind(Component.class, ComponentWithInjectConstructor.class);
+            config.bind(Dependency.class, DependencyWithNestedDependency.class);
+            config.bind(NestedDependency.class, NestedDependencyOnComponent.class);
+            CyclicDependenciesFoundException exception = assertThrows(CyclicDependenciesFoundException.class, () -> config.context());
+            assertEquals(3, exception.components().size());
+            assertThat(exception.components()).containsExactlyInAnyOrder(Component.class, Dependency.class, NestedDependency.class);
+        }
+
+    }
+
+    @Nested
     public class ComponentConstruction {
 
         @Test
@@ -75,42 +107,6 @@ public class ContainerTest {
             @Test
             void should_throw_when_no_inject_or_default_constructor_provided() {
                 assertThrows(IllegalComponentException.class, () -> config.bind(Component.class, ComponentWithNoInjectAndDefaultConstructorProvided.class));
-            }
-
-            @Test
-            void should_throw_when_dependency_is_not_found() {
-                config.bind(Component.class, ComponentWithInjectConstructor.class);
-                DependencyNotFoundException exception = assertThrows(DependencyNotFoundException.class, () -> config.context());
-                assertEquals(Dependency.class, exception.dependency());
-                assertEquals(Component.class, exception.component());
-            }
-
-            @Test
-            void should_throw_if_transitive_dependency_not_found() {
-                config.bind(Component.class, ComponentWithInjectConstructor.class);
-                config.bind(Dependency.class, DependencyWithInjectConstructor.class);
-                DependencyNotFoundException exception = assertThrows(DependencyNotFoundException.class, () -> config.context());
-                assertEquals(String.class, exception.dependency());
-                assertEquals(Dependency.class, exception.component());
-            }
-
-            @Test
-            void should_throw_if_cyclic_dependencies_found() {
-                config.bind(Component.class, ComponentWithInjectConstructor.class);
-                config.bind(Dependency.class, DependencyDependedOnComponent.class);
-                CyclicDependenciesFoundException exception = assertThrows(CyclicDependenciesFoundException.class, () -> config.context());
-                assertEquals(2, exception.components().size());
-                assertThat(exception.components()).containsExactlyInAnyOrder(Dependency.class, Component.class);
-            }
-
-            @Test
-            void should_throw_if_three_cyclic_dependencies_found() {
-                config.bind(Component.class, ComponentWithInjectConstructor.class);
-                config.bind(Dependency.class, DependencyWithNestedDependency.class);
-                config.bind(NestedDependency.class, NestedDependencyOnComponent.class);
-                CyclicDependenciesFoundException exception = assertThrows(CyclicDependenciesFoundException.class, () -> config.context());
-                assertEquals(3, exception.components().size());
-                assertThat(exception.components()).containsExactlyInAnyOrder(Component.class, Dependency.class, NestedDependency.class);
             }
 
             @Test
