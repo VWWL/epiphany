@@ -30,8 +30,9 @@ public class ContextConfig {
 
     public <Type, Implementation extends Type> void bind(final Class<Type> type, final Class<Implementation> implementation) {
         check(implementation);
-        providers.put(type, new ConstructorInjectionProvider<>(type, implementation));
-        dependencies.put(type, stream(injectConstructor(implementation).getParameters()).map(Parameter::getType).collect(Collectors.toList()));
+        Constructor<Implementation> injectConstructor = injectConstructor(implementation);
+        providers.put(type, new ConstructorInjectionProvider<>(type, injectConstructor));
+        dependencies.put(type, stream(injectConstructor.getParameters()).map(Parameter::getType).collect(Collectors.toList()));
     }
 
     public Context context() {
@@ -72,46 +73,4 @@ public class ContextConfig {
         return (Constructor<Type>) injectConstructors.findFirst().orElseGet(() -> evaluate(implementation::getConstructor).evaluate());
     }
 
-    class ConstructorInjectionProvider<Type> implements Provider<Type> {
-        private final Class<?> componentType;
-        private final Class<Type> implementation;
-        private boolean constructing;
-
-        public ConstructorInjectionProvider(final Class<?> componentType, final Class<Type> implementation) {
-            this.componentType = componentType;
-            this.implementation = implementation;
-        }
-
-        @Override
-        public Type get(Context context) {
-            if (constructing) throw new CyclicDependenciesFoundException(componentType);
-            try {
-                constructing();
-                return createInstanceByInjectOrDefaultConstructor(context);
-            } catch (CyclicDependenciesFoundException e) {
-                throw new CyclicDependenciesFoundException(componentType, e);
-            } finally {
-                constructed();
-            }
-        }
-
-        private Type createInstanceByInjectOrDefaultConstructor(Context context) {
-            Constructor<Type> injectConstructor = injectConstructor(implementation);
-            Object[] dependencies = stream(injectConstructor.getParameters())
-                    .map(Parameter::getType)
-                    .map(context::get)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .toArray(Object[]::new);
-            return evaluate(() -> injectConstructor.newInstance(dependencies)).evaluate();
-        }
-
-        private void constructing() {
-            this.constructing = true;
-        }
-
-        private void constructed() {
-            this.constructing = false;
-        }
-    }
 }
