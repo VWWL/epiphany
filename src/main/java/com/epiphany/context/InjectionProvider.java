@@ -13,13 +13,13 @@ import static java.util.Arrays.stream;
 
 public final class InjectionProvider<Type> implements Provider<Type> {
 
-    private final Constructor<Type> injectConstructor;
+    private final Constructors<Type> constructors;
     private final List<Field> injectFields;
     private final List<Method> injectMethods;
 
     public InjectionProvider(final Class<Type> component) {
         checkConstructor(component);
-        this.injectConstructor = initInjectConstructor(component);
+        this.constructors = new Constructors<>(component);
         this.injectFields = initInjectFields(component);
         this.injectMethods = initInjectMethods(component);
         if (injectFields.stream().anyMatch(o -> Modifier.isFinal(o.getModifiers()))) throw new IllegalComponentException();
@@ -29,9 +29,9 @@ public final class InjectionProvider<Type> implements Provider<Type> {
     @Override
     @SuppressWarnings("all")
     public Type get(final Context context) {
-        Object[] dependencies = toDependencies(context, injectConstructor);
+        Object[] dependencies = toDependencies(context, constructors.get());
         return evaluate(() -> {
-            Type instance = injectConstructor.newInstance(dependencies);
+            Type instance = constructors.get().newInstance(dependencies);
             for (Field field : injectFields) {
                 field.setAccessible(true);
                 field.set(instance, toDependency(context, field));
@@ -49,7 +49,7 @@ public final class InjectionProvider<Type> implements Provider<Type> {
         return Stream.of(
             injectFields.stream().map(Field::getType),
             injectMethods.stream().flatMap(m -> stream(m.getParameterTypes())),
-            stream(injectConstructor.getParameterTypes())
+            stream(constructors.get().getParameterTypes())
         ).flatMap(o -> o).collect(Collectors.toList());
     }
 
@@ -90,11 +90,6 @@ public final class InjectionProvider<Type> implements Provider<Type> {
 
     private static boolean isOverrideByInjectMethod(List<Method> injectMethods, Method method) {
         return injectMethods.stream().noneMatch(m -> isOverride(method, m));
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <Type> Constructor<Type> initInjectConstructor(Class<Type> component) {
-        return (Constructor<Type>) injectableStream(component.getConstructors()).findFirst().orElseGet(() -> evaluate(component::getDeclaredConstructor).evaluate());
     }
 
     @SuppressWarnings("all")
