@@ -260,6 +260,7 @@ class SuperClassWithInjectMethod {
     }
 
     @Inject
+    public void inject() {
     }
 
     public Dependency dependency() {
