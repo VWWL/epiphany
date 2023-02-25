@@ -15,7 +15,7 @@ public class InjectConstructor<Type> {
         this.impl = (Constructor<Type>) InjectStream.of(component.getConstructors()).injectablePart().findFirst().orElseGet(() -> evaluate(component::getDeclaredConstructor).evaluate());
     }
 
-    public Class<?>[] dependencyClasses() {
+    public Class<?>[] dependencies() {
         return impl.getParameterTypes();
     }
 

@@ -40,9 +40,9 @@ public final class InjectionProvider<Type> implements Provider<Type> {
     @Override
     public List<Class<?>> dependencies() {
         return Stream.of(
-            injectFields.get().stream().map(Field::getType),
+            injectFields.dependencies(),
             injectMethods.stream().flatMap(m -> stream(m.getParameterTypes())),
-            stream(constructors.dependencyClasses())
+            stream(constructors.dependencies())
         ).flatMap(o -> o).collect(Collectors.toList());
     }
 
