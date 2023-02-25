@@ -30,11 +30,7 @@ public final class InjectionProvider<Type> implements Provider<Type> {
 
     @Override
     public List<Class<?>> dependencies() {
-        return Stream.of(
-            injectFields.dependencies(),
-            injectMethods.dependencies(),
-            constructor.dependencies()
-        ).flatMap(o -> o).collect(Collectors.toList());
+        return Stream.of(injectFields.dependencies(), injectMethods.dependencies(), constructor.dependencies()).flatMap(o -> o).collect(Collectors.toList());
     }
 
     private <Type> void checkConstructor(final Class<Type> component) {
