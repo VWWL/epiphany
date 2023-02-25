@@ -11,10 +11,13 @@ import static org.junit.jupiter.api.Assertions.*;
 public class InjectionTest {
 
     private ContextConfig config;
+    private Dependency dependency;
 
     @BeforeEach
     void setUp() {
-        config = new ContextConfig();
+        this.config = new ContextConfig();
+        this.dependency = new Dependency() {};
+        config.bind(Dependency.class, dependency);
     }
 
     @Nested
@@ -29,8 +32,6 @@ public class InjectionTest {
 
         @Test
         void should_bind_type_to_a_inject_constructor() {
-            Dependency dependency = new Dependency() {};
-            config.bind(Dependency.class, dependency);
             Component instance = getComponent(Component.class, ComponentWithInjectConstructor.class);
             assertNotNull(instance);
             assertSame(dependency, ((ComponentWithInjectConstructor) instance).dependency());
@@ -80,16 +81,12 @@ public class InjectionTest {
 
         @Test
         void should_inject_dependency_via_field() {
-            Dependency dependency = new Dependency() {};
-            config.bind(Dependency.class, dependency);
             ComponentWithFieldInjection component = getComponent(ComponentWithFieldInjection.class, ComponentWithFieldInjection.class);
             assertSame(dependency, component.dependency());
         }
 
         @Test
         void should_inject_subclass_dependency_via_field() {
-            Dependency dependency = new Dependency() {};
-            config.bind(Dependency.class, dependency);
             ComponentWithFieldInjection component = getComponent(ComponentWithFieldInjection.class, SubclassWithComponentWithFieldInjection.class);
             assertSame(dependency, component.dependency());
         }
@@ -125,8 +122,6 @@ public class InjectionTest {
 
         @Test
         void should_inject_dependency_via_inject_method() {
-            Dependency dependency = new Dependency() {};
-            config.bind(Dependency.class, dependency);
             MethodInjectionWithDependency component = getComponent(MethodInjectionWithDependency.class, MethodInjectionWithDependency.class);
             assertSame(dependency, component.dependency());
         }
@@ -156,8 +151,6 @@ public class InjectionTest {
 
         @Test
         void should_only_call_once_if_subclass_override_inject_method_with_inject() {
-            Dependency dependency = new Dependency() {};
-            config.bind(Dependency.class, dependency);
             SubClassOverrideSuperClassWithInject component = getComponent(SubClassOverrideSuperClassWithInject.class, SubClassOverrideSuperClassWithInject.class);
             assertNull(component.dependency());
         }
