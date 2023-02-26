@@ -111,12 +111,14 @@ public class ContainerTest {
                 for (Named component : List.of(
                     Named.of("Inject Constructor", CyclicComponentInjectConstructor.class),
                     Named.of("Inject Field", CyclicComponentInjectField.class),
-                    Named.of("Inject Method", CyclicComponentInjectMethod.class))
+                    Named.of("Inject Method", CyclicComponentInjectMethod.class),
+                    Named.of("Register Method", CyclicComponentRegisterMethod.class))
                 ) {
                     for (Named dependency : List.of(
                         Named.of("Inject Constructor", CyclicDependencyInjectMethod.class),
                         Named.of("Inject Field", CyclicDependencyInjectField.class),
-                        Named.of("Inject Method", CyclicDependencyInjectMethod.class)
+                        Named.of("Inject Method", CyclicDependencyInjectMethod.class),
+                        Named.of("Register Method", CyclicDependencyRegisterMethod.class)
                     )) {
                         arguments.add(Arguments.of(component, dependency));
                     }
