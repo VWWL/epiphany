@@ -62,6 +62,15 @@ public class ContainerTest {
                 assertEquals(Optional.empty(), component);
             }
 
+            @Test
+            @Disabled
+            void should_bind_dependencies_via_bindings() {
+                config.bind(InjectionsWithDependency.class, InjectionsWithDependency.class);
+                Optional<Dependency> dependency = config.context().get(Dependency.class);
+                assertTrue(dependency.isPresent());
+                assertThat(dependency.get()).isInstanceOf(Dependency.class);
+            }
+
         }
 
         @Nested
