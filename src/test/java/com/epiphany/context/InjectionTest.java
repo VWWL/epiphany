@@ -1,6 +1,6 @@
 package com.epiphany.context;
 
-import com.epiphany.context.exception.*;
+import com.epiphany.context.exception.IllegalComponentException;
 import com.epiphany.context.source.*;
 import org.junit.jupiter.api.*;
 import org.mockito.Mock;
@@ -223,15 +223,6 @@ public class InjectionTest {
         void should_register_component_using_registrations() throws NoSuchMethodException {
             Dependency component = new ExplicitRegistrationProvider<InjectionsWithDependency, Dependency>(InjectionsWithDependency.class, InjectionsWithDependency.class.getDeclaredMethod("dependency", Component.class)).get(context);
             assertSame(dependency, component);
-        }
-
-        @Test
-        void should_throw_exception_if_dependency_not_found() throws NoSuchMethodException {
-            when(context.get(Component.class)).thenReturn(Optional.empty());
-            DependencyNotFoundException exception = assertThrows(DependencyNotFoundException.class, () -> new ExplicitRegistrationProvider<InjectionsWithDependency, Dependency>(InjectionsWithDependency.class,
-                InjectionsWithDependency.class.getDeclaredMethod("dependency", Component.class)).get(context));
-            assertEquals(Component.class, exception.dependency());
-            assertEquals(Dependency.class, exception.component());
         }
 
     }

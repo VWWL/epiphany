@@ -1,8 +1,6 @@
 package com.epiphany.context;
 
-import com.epiphany.context.exception.DependencyNotFoundException;
-
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 import java.util.*;
 
 import static com.epiphany.general.Exceptions.evaluate;
@@ -22,9 +20,7 @@ public class ExplicitRegistrationProvider<RegistrationsType, Type> implements Pr
     @SuppressWarnings("all")
     public Type get(Context context) {
         RegistrationsType registrations = context.get(registrationsType).get();
-        Object[] dependencies = stream(method.getParameters())
-            .map(o -> context.get(o.getType()).orElseThrow(() -> new DependencyNotFoundException(o.getType(), method.getReturnType())))
-            .toArray(Object[]::new);
+        Object[] dependencies = stream(method.getParameters()).map(Parameter::getType).map(context::get).map(Optional::get).toArray(Object[]::new);
         return (Type) evaluate(() -> method.invoke(registrations, dependencies)).evaluate();
     }
 
