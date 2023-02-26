@@ -208,4 +208,23 @@ public class InjectionTest {
 
     }
 
+    @Nested
+    public class ExplicitRegistration {
+
+        private @Mock InjectionsWithDependency injectionsWithDependency;
+
+        @BeforeEach
+        void setUp() {
+            when(injectionsWithDependency.dependency(componentInstance)).thenReturn(dependency);
+            when(context.get(InjectionsWithDependency.class)).thenReturn(Optional.of(injectionsWithDependency));
+        }
+
+        @Test
+        void should_register_component_using_registrations() throws NoSuchMethodException {
+            Dependency component = new ExplicitRegistrationProvider<InjectionsWithDependency, Dependency>(InjectionsWithDependency.class, InjectionsWithDependency.class.getDeclaredMethod("dependency", Component.class)).get(context);
+            assertSame(dependency, component);
+        }
+
+    }
+
 }
