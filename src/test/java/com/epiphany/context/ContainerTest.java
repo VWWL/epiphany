@@ -49,7 +49,7 @@ public class ContainerTest {
 
             @Test
             void should_bind_type_from_class_path() {
-                config.bind(Dependency.class, new ClassName("com.epiphany.context.source.DependencyWithNestedDependency"));
+                config.bind(InjectClasses.from(Dependency.class, "com.epiphany.context.source.DependencyWithNestedDependency"));
                 config.bind(NestedDependency.class, new NestedDependency() {});
                 Optional<Dependency> dependency = config.context().get(Dependency.class);
                 assertTrue(dependency.isPresent());
@@ -160,12 +160,12 @@ public class ContainerTest {
 
             @Test
             void should_throw_exception_when_class_name_is_not_present() {
-                assertThrows(IllegalComponentException.class,() -> config.bind(Component.class, new ClassName("")));
+                assertThrows(IllegalComponentException.class, () -> config.bind(InjectClasses.from(Component.class, "")));
             }
 
             @Test
             void should_throw_exception_when_class_is_not_a_subtype_of_bind_class() {
-                assertThrows(IllegalComponentException.class,() -> config.bind(NestedDependency.class, new ClassName("com.epiphany.context.source.DependencyWithNestedDependency")));
+                assertThrows(IllegalComponentException.class, () -> config.bind(InjectClasses.from(NestedDependency.class, "com.epiphany.context.source.DependencyWithNestedDependency")));
             }
 
         }

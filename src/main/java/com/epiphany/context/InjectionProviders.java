@@ -4,8 +4,6 @@ import com.epiphany.context.exception.*;
 
 import java.util.*;
 
-import static com.epiphany.general.Exceptions.evaluate;
-
 public class InjectionProviders {
 
     private final Map<Class<?>, Provider<?>> impl;
@@ -26,15 +24,8 @@ public class InjectionProviders {
         impl.put(type, new InjectionProvider<>(implementation));
     }
 
-    @SuppressWarnings("unchecked")
-    public <Type, Implementation extends Type> void register(Class<Type> type, ClassName className) {
-        try {
-            Class<Implementation> implementation = (Class<Implementation>) evaluate(() -> Class.forName(className.className())).evaluate();
-            if (!type.isAssignableFrom(implementation)) throw new IllegalComponentException();
-            this.register(type, implementation);
-        } catch (Exception e) {
-            throw new IllegalComponentException();
-        }
+    public <Type, Implementation extends Type> void register(InjectClasses<Type, Implementation> injectClasses) {
+        this.register(injectClasses.type(), injectClasses.implementation());
     }
 
     public void checkDependencies() {
