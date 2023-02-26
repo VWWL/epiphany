@@ -2,9 +2,10 @@ package com.epiphany.context.source;
 
 import com.epiphany.context.*;
 
-public @Bindings class InjectionsWithDependency {
+@SuppressWarnings("unused")
+public @Registrations class InjectionsWithDependency {
 
-    public @Binding Dependency dependency() {
+    public @Registration Dependency dependency(Component component) {
         return new Dependency() {};
     }
 
