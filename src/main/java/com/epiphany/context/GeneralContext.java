@@ -14,7 +14,7 @@ class GeneralContext implements Context {
     @Override
     @SuppressWarnings("unchecked")
     public <Type> Optional<Type> get(Class<Type> type) {
-        return Optional.ofNullable(injectionProviders.providers().get(type)).map(provider -> provider.get(this)).map(o -> (Type) o);
+        return Optional.ofNullable(injectionProviders.get(type)).map(provider -> provider.get(this)).map(o -> (Type) o);
     }
 
 }

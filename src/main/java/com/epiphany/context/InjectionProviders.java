@@ -14,8 +14,8 @@ public class InjectionProviders {
         this.impl = new HashMap<>();
     }
 
-    public Map<Class<?>, Provider<?>> providers() {
-        return impl;
+    public <Type> Provider<?> get(Class<Type> type) {
+        return impl.get(type);
     }
 
     public <Type> void register(Class<Type> type, Type instance) {
