@@ -89,7 +89,8 @@ public class ContainerTest {
                 return Stream.of(
                     Arguments.of(Named.of("Inject Constructor", MissingDependencyConstructor.class)),
                     Arguments.of(Named.of("Inject Field", MissingDependencyField.class)),
-                    Arguments.of(Named.of("Inject Method", MissingDependencyMethod.class))
+                    Arguments.of(Named.of("Inject Method", MissingDependencyMethod.class)),
+                    Arguments.of(Named.of("Register Method", MissingDependencyRegistration.class))
                 );
             }
 

@@ -21,7 +21,10 @@ public class ExplicitRegistrationProvider<RegistrationsType, Type> implements Pr
     public Type get(Context context) {
         RegistrationsType registrations = context.get(registrationsType).get();
         Object[] dependencies = stream(method.getParameters()).map(Parameter::getType).map(context::get).map(Optional::get).toArray(Object[]::new);
-        return (Type) evaluate(() -> method.invoke(registrations, dependencies)).evaluate();
+        return (Type) evaluate(() -> {
+            method.setAccessible(true);
+            return method.invoke(registrations, dependencies);
+        }).evaluate();
     }
 
     @Override
