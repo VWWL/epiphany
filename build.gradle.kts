@@ -3,7 +3,7 @@ plugins {
     jacoco
 }
 
-group = "com.epiphany"
+group = "github.epiphany"
 version = "1.0.0"
 
 repositories {
