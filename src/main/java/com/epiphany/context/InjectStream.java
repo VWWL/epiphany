@@ -25,4 +25,8 @@ public final class InjectStream<T extends AnnotatedElement> {
         return stream(content).filter(o -> !o.isAnnotationPresent(Inject.class));
     }
 
+    public Stream<T> injectionPart() {
+        return stream(content).filter(o -> o.isAnnotationPresent(Registration.class));
+    }
+
 }

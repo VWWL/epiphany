@@ -2,7 +2,6 @@ package com.epiphany.context;
 
 import com.epiphany.context.exception.*;
 
-import java.lang.reflect.Method;
 import java.util.*;
 
 public class InjectionProviders {
@@ -23,12 +22,8 @@ public class InjectionProviders {
 
     public <Type, Implementation extends Type> void register(Class<Type> type, Class<Implementation> implementation) {
         impl.put(type, new InjectionProvider<>(implementation));
-        if (implementation.isAnnotationPresent(Registrations.class)) {
-            List<Method> registrationMethod = Arrays.stream(implementation.getDeclaredMethods()).filter(o -> o.isAnnotationPresent(Registration.class)).toList();
-            for (Method method : registrationMethod) {
-                impl.put(method.getReturnType(), new ExplicitRegistrationProvider<>(type, method));
-            }
-        }
+        if (!implementation.isAnnotationPresent(Registrations.class)) return;
+        InjectStream.of(implementation.getDeclaredMethods()).injectionPart().forEach(method -> impl.put(method.getReturnType(), new ExplicitRegistrationProvider<>(type, method)));
     }
 
     public <Type, Implementation extends Type> void register(InjectClasses<Type, Implementation> injectClasses) {
