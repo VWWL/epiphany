@@ -1,8 +1,8 @@
 plugins {
     `java-library`
     jacoco
-    id 'maven-publish'
-    id 'signing'
+    `maven-publish`
+    signing
 }
 
 group = "io.github.neilwangweili"
