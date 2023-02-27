@@ -1,6 +1,8 @@
 plugins {
     `java-library`
     jacoco
+    id 'maven-publish'
+    id 'signing'
 }
 
 group = "io.github.neilwangweili"
@@ -27,7 +29,17 @@ tasks.withType<Test> {
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+    withJavadocJar()
+    withSourcesJar()
 }
+
+javaDoc {
+    options.addStringOption("charset", "UTF-8")
+    if (JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
+}
+
 
 tasks.jacocoTestReport {
     reports {
@@ -70,4 +82,54 @@ tasks.test {
 }
 tasks.jacocoTestReport {
     dependsOn(tasks.test)
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'epiphany'
+            from components.java
+                    pom {
+                        name = 'epiphany'
+                        description = 'A lightweight dependency injection framework.'
+                        url = 'https://github.com/neilwangweili/epiphany'
+                        licenses {
+                            license {
+                                name = '许可证名称'
+                                url = '许可证地址'
+                            }
+                        }
+                        developers {
+                            developer {
+                                id = 'neilwangweili'
+                                name = 'Neil Wang'
+                                email = 'wangweili457@gmail.com'
+                            }
+                        }
+                        scm {
+                            connection = 'https://github.com/neilwangweili/epiphany.git'
+                            developerConnection = 'https://github.com/neilwangweili/epiphany.git'
+                            url = 'https://github.com/neilwangweili/epiphany'
+                        }
+                    }
+        }
+    }
+    repositories {
+        maven {
+            name = "OSSRH"
+            if (project.version.toString().endsWith("-SNAPSHOT")) {
+                url = "https://s01.oss.sonatype.org/content/repositories/snapshots"
+            } else {
+                url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            }
+            credentials {
+                username = findProperty("ossrhUsername") ?: System.getenv("OSSRH_USERNAME")
+                password = findProperty("ossrhPassword") ?: System.getenv("OSSRH_PASSWORD")
+            }
+        }
+    }
+}
+
+signing {
+    sign(publishing.publications.mavenJava)
 }
