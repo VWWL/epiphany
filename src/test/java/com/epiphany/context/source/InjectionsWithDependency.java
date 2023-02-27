@@ -3,9 +3,9 @@ package com.epiphany.context.source;
 import com.epiphany.context.*;
 
 @SuppressWarnings("unused")
-public @Registrations class InjectionsWithDependency {
+public @Injections class InjectionsWithDependency {
 
-    public @Registration Dependency dependency(Component component) {
+    public @Injection Dependency dependency(Component component) {
         return new Dependency() {};
     }
 

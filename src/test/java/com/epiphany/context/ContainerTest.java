@@ -90,7 +90,7 @@ public class ContainerTest {
                     Arguments.of(Named.of("Inject Constructor", MissingDependencyConstructor.class)),
                     Arguments.of(Named.of("Inject Field", MissingDependencyField.class)),
                     Arguments.of(Named.of("Inject Method", MissingDependencyMethod.class)),
-                    Arguments.of(Named.of("Register Method", MissingDependencyRegistration.class))
+                    Arguments.of(Named.of("Injection Method", MissingDependencyInjection.class))
                 );
             }
 
@@ -112,13 +112,13 @@ public class ContainerTest {
                     Named.of("Inject Constructor", CyclicComponentInjectConstructor.class),
                     Named.of("Inject Field", CyclicComponentInjectField.class),
                     Named.of("Inject Method", CyclicComponentInjectMethod.class),
-                    Named.of("Register Method", CyclicComponentRegisterMethod.class))
+                    Named.of("Injection Method", CyclicComponentInjectionMethod.class))
                 ) {
                     for (Named dependency : List.of(
                         Named.of("Inject Constructor", CyclicDependencyInjectMethod.class),
                         Named.of("Inject Field", CyclicDependencyInjectField.class),
                         Named.of("Inject Method", CyclicDependencyInjectMethod.class),
-                        Named.of("Register Method", CyclicDependencyRegisterMethod.class)
+                        Named.of("Injection Method", CyclicDependencyInjectionMethod.class)
                     )) {
                         arguments.add(Arguments.of(component, dependency));
                     }
@@ -143,19 +143,19 @@ public class ContainerTest {
                     Named.of("Inject Constructor", CyclicComponentInjectConstructor.class),
                     Named.of("Inject Field", CyclicComponentInjectField.class),
                     Named.of("Inject Method", CyclicComponentInjectMethod.class),
-                    Named.of("Register Method", CyclicComponentRegisterMethod.class))
+                    Named.of("Injection Method", CyclicComponentInjectionMethod.class))
                 ) {
                     for (Named dependency : List.of(
                         Named.of("Inject Constructor", IndirectCyclicDependencyInjectConstructor.class),
                         Named.of("Inject Field", IndirectCyclicDependencyInjectField.class),
                         Named.of("Inject Method", IndirectCyclicDependencyInjectMethod.class),
-                        Named.of("Register Method", IndirectCyclicDependencyRegisterMethod.class)
+                        Named.of("Injection Method", IndirectCyclicDependencyInjectionMethod.class)
                     )) {
                         for (Named anotherDependency : List.of(
                             Named.of("Inject Constructor", IndirectCyclicComponentInjectConstructor.class),
                             Named.of("Inject Field", IndirectCyclicComponentInjectField.class),
                             Named.of("Inject Method", IndirectCyclicComponentInjectMethod.class),
-                            Named.of("Inject Method", IndirectCyclicComponentRegisterMethod.class)
+                            Named.of("Injection Method", IndirectCyclicComponentInjectionMethod.class)
                         )) {
                             arguments.add(Arguments.of(component, dependency, anotherDependency));
                         }

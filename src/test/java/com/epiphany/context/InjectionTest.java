@@ -209,7 +209,7 @@ public class InjectionTest {
     }
 
     @Nested
-    public class ExplicitRegistration {
+    public class ExplicitInjection {
 
         private @Mock InjectionsWithDependency injectionsWithDependency;
 
@@ -220,8 +220,8 @@ public class InjectionTest {
         }
 
         @Test
-        void should_register_component_using_registrations() throws NoSuchMethodException {
-            Dependency component = new ExplicitRegistrationProvider<InjectionsWithDependency, Dependency>(InjectionsWithDependency.class, InjectionsWithDependency.class.getDeclaredMethod("dependency", Component.class)).get(context);
+        void should_register_component_using_injections() throws NoSuchMethodException {
+            Dependency component = new ExplicitInjectionProvider<InjectionsWithDependency, Dependency>(InjectionsWithDependency.class, InjectionsWithDependency.class.getDeclaredMethod("dependency", Component.class)).get(context);
             assertSame(dependency, component);
         }
 
