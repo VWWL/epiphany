@@ -5,13 +5,13 @@ import java.util.stream.*;
 
 import static com.epiphany.general.Exceptions.evaluate;
 
-public final class InjectionProvider<Type> implements Provider<Type> {
+public final class GeneralInjectionProvider<Type> implements Provider<Type> {
 
     private final InjectConstructor<Type> constructor;
     private final InjectFields injectFields;
     private final InjectMethods injectMethods;
 
-    public InjectionProvider(final Class<Type> component) {
+    public GeneralInjectionProvider(final Class<Type> component) {
         this.constructor = new InjectConstructor<>(component);
         this.injectFields = new InjectFields(component);
         this.injectMethods = new InjectMethods(component);

@@ -21,7 +21,7 @@ public class InjectionProviders {
     }
 
     public <Type, Implementation extends Type> void register(Class<Type> type, Class<Implementation> implementation) {
-        impl.put(type, new InjectionProvider<>(implementation));
+        impl.put(type, new GeneralInjectionProvider<>(implementation));
         if (!implementation.isAnnotationPresent(Injections.class)) return;
         InjectStream.of(implementation.getDeclaredMethods()).injectionPart().forEach(method -> impl.put(method.getReturnType(), new ExplicitInjectionProvider<>(type, method)));
     }
