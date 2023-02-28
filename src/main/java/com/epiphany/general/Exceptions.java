@@ -1,11 +1,11 @@
 package com.epiphany.general;
 
 public interface Exceptions {
-    static RunnableExceptions execute(RunnableWithCheckedException runnable) {
+    static RunnableExceptions execute(final RunnableWithCheckedException runnable) {
         return new RunnableExceptions(runnable);
     }
 
-    static <R> EvaluateExceptions<R> evaluate(SupplierWithCheckedException<R> supplier) {
+    static <R> EvaluateExceptions<R> evaluate(final SupplierWithCheckedException<R> supplier) {
         return new EvaluateExceptions<>(supplier);
     }
 

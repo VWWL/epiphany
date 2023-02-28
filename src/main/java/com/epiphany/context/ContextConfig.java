@@ -16,7 +16,7 @@ public final class ContextConfig {
         injectionProviders.register(type, implementation);
     }
 
-    public <Type, Implementation extends Type> void bind(InjectClasses<Type, Implementation> injectClasses) {
+    public <Type, Implementation extends Type> void bind(final InjectClasses<Type, Implementation> injectClasses) {
         injectionProviders.register(injectClasses);
     }
 

@@ -10,7 +10,7 @@ class InjectComponent<Type> {
 
     private final Class<Type> component;
 
-    public InjectComponent(Class<Type> component) {
+    public InjectComponent(final Class<Type> component) {
         this.component = component;
     }
 

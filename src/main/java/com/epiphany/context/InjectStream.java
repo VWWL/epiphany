@@ -9,11 +9,11 @@ final class InjectStream<T extends AnnotatedElement> {
 
     private final T[] content;
 
-    public static <T extends AnnotatedElement> InjectStream<T> of(T[] content) {
+    public static <T extends AnnotatedElement> InjectStream<T> of(final T[] content) {
         return new InjectStream<>(content);
     }
 
-    private InjectStream(T[] content) {
+    private InjectStream(final T[] content) {
         this.content = content;
     }
 

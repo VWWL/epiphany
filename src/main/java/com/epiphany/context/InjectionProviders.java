@@ -12,21 +12,21 @@ class InjectionProviders {
         this.impl = new HashMap<>();
     }
 
-    public <Type> Provider<?> get(Class<Type> type) {
+    public <Type> Provider<?> get(final Class<Type> type) {
         return impl.get(type);
     }
 
-    public <Type> void register(Class<Type> type, Type instance) {
+    public <Type> void register(final Class<Type> type, final Type instance) {
         impl.put(type, context -> instance);
     }
 
-    public <Type, Implementation extends Type> void register(Class<Type> type, Class<Implementation> implementation) {
+    public <Type, Implementation extends Type> void register(final Class<Type> type, final Class<Implementation> implementation) {
         impl.put(type, new GeneralInjectionProvider<>(implementation));
         if (!implementation.isAnnotationPresent(Injections.class)) return;
         InjectStream.of(implementation.getDeclaredMethods()).injectionPart().forEach(method -> impl.put(method.getReturnType(), new ExplicitInjectionProvider<>(type, method)));
     }
 
-    public <Type, Implementation extends Type> void register(InjectClasses<Type, Implementation> injectClasses) {
+    public <Type, Implementation extends Type> void register(final InjectClasses<Type, Implementation> injectClasses) {
         this.register(injectClasses.type(), injectClasses.implementation());
     }
 

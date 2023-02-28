@@ -4,7 +4,7 @@ import java.util.List;
 
 interface Provider<Type> {
 
-    Type get(Context context);
+    Type get(final Context context);
 
     default List<Class<?>> dependencies() {
         return List.of();

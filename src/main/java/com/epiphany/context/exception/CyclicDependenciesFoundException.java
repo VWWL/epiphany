@@ -6,7 +6,7 @@ public final class CyclicDependenciesFoundException extends RuntimeException {
 
     private final Set<Class<?>> components;
 
-    public CyclicDependenciesFoundException(Stack<Class<?>> visiting) {
+    public CyclicDependenciesFoundException(final Stack<Class<?>> visiting) {
         components = new LinkedHashSet<>();
         components.addAll(visiting);
     }

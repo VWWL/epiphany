@@ -12,7 +12,7 @@ class InjectConstructor<Type> {
     private final Constructor<Type> impl;
 
     @SuppressWarnings("unchecked")
-    public InjectConstructor(Class<Type> component) {
+    public InjectConstructor(final Class<Type> component) {
         new InjectComponent<>(component).check();
         this.impl = (Constructor<Type>) InjectStream.of(component.getConstructors()).injectablePart().findFirst().orElseGet(() -> evaluate(component::getDeclaredConstructor).evaluate());
     }
@@ -22,7 +22,7 @@ class InjectConstructor<Type> {
     }
 
     @SuppressWarnings("all")
-    public Type newInstance(Context context, InjectFields injectFields, InjectMethods injectMethods) {
+    public Type newInstance(final Context context, final InjectFields injectFields, final InjectMethods injectMethods) {
         Object[] dependencies = stream(impl.getParameters()).map(Parameter::getType).map(context::get).map(Optional::get).toArray(Object[]::new);
         Type instance = evaluate(() -> impl.newInstance(dependencies)).evaluate();
         injectFields.injectInto(context, instance);

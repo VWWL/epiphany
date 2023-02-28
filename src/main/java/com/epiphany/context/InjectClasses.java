@@ -8,7 +8,7 @@ final class InjectClasses<Type, Implementation extends Type> {
     private final Class<Implementation> implementation;
 
     @SuppressWarnings("unchecked")
-    public static <Type, Implementation extends Type> InjectClasses<Type, Implementation> from(Class<Type> injectType, String className) {
+    public static <Type, Implementation extends Type> InjectClasses<Type, Implementation> from(final Class<Type> injectType, final String className) {
         try {
             Class<Implementation> implementation = (Class<Implementation>) Class.forName(className);
             if (!injectType.isAssignableFrom(implementation)) throw new IllegalComponentException();
@@ -18,7 +18,7 @@ final class InjectClasses<Type, Implementation extends Type> {
         }
     }
 
-    public InjectClasses(Class<Type> injectType, Class<Implementation> implementation) {
+    public InjectClasses(final Class<Type> injectType, final Class<Implementation> implementation) {
         this.injectType = injectType;
         this.implementation = implementation;
     }

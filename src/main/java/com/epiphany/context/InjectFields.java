@@ -12,13 +12,13 @@ class InjectFields {
 
     private final List<Field> impl;
 
-    public <Type> InjectFields(Class<Type> component) {
+    public <Type> InjectFields(final Class<Type> component) {
         this.impl = new Traverser<Field>().traverse(component, (methods, current) -> InjectStream.of(current.getDeclaredFields()).injectablePart().toList());
         if (impl.stream().anyMatch(o -> Modifier.isFinal(o.getModifiers()))) throw new IllegalComponentException();
     }
 
     @SuppressWarnings("all")
-    public <Type> void injectInto(Context context, Type instance) {
+    public <Type> void injectInto(final Context context, final Type instance) {
         for (Field field : impl) {
             field.setAccessible(true);
             execute(() -> field.set(instance, context.get(field.getType()).get())).run();
