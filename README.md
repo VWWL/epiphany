@@ -16,6 +16,8 @@ dependencies {
     implementation("io.github.neilwangweili:epiphany:${latest}")
 }
 ~~~
+
+### Maven
 ~~~xml
 <!-- https://mvnrepository.com/artifact/io.kevinlee/extras-cats -->
 <dependency>
@@ -24,3 +26,10 @@ dependencies {
     <version>${latest}</version>
 </dependency>
 ~~~
+
+## Notes
+1. Version requirement: Java 17
+2. How to make pr?
+    1. Code coverage must be 100%.
+    2. Strictly follow object-oriented principles like [object calisthenics](https://williamdurand.fr/2013/06/03/object-calisthenics/).
+
