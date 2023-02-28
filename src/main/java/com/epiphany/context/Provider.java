@@ -2,7 +2,7 @@ package com.epiphany.context;
 
 import java.util.List;
 
-public interface Provider<Type> {
+interface Provider<Type> {
 
     Type get(Context context);
 

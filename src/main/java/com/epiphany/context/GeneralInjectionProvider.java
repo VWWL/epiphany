@@ -5,7 +5,7 @@ import java.util.stream.*;
 
 import static com.epiphany.general.Exceptions.evaluate;
 
-public final class GeneralInjectionProvider<Type> implements Provider<Type> {
+final class GeneralInjectionProvider<Type> implements Provider<Type> {
 
     private final InjectConstructor<Type> constructor;
     private final InjectFields injectFields;

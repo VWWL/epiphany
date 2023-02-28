@@ -6,7 +6,7 @@ import java.lang.reflect.*;
 
 import static java.util.Arrays.stream;
 
-public class InjectComponent<Type> {
+class InjectComponent<Type> {
 
     private final Class<Type> component;
 

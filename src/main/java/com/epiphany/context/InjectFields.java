@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 
 import static com.epiphany.general.Exceptions.execute;
 
-public class InjectFields {
+class InjectFields {
 
     private final List<Field> impl;
 

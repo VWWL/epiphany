@@ -6,7 +6,7 @@ import java.util.*;
 import static com.epiphany.general.Exceptions.evaluate;
 import static java.util.Arrays.stream;
 
-public class ExplicitInjectionProvider<InjectionsType, Type> implements Provider<Type> {
+class ExplicitInjectionProvider<InjectionsType, Type> implements Provider<Type> {
 
     private final Class<InjectionsType> injectionsType;
     private final Method method;

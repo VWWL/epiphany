@@ -2,7 +2,7 @@ package com.epiphany.context;
 
 import com.epiphany.context.exception.IllegalComponentException;
 
-public final class InjectClasses<Type, Implementation extends Type> {
+final class InjectClasses<Type, Implementation extends Type> {
 
     private final Class<Type> injectType;
     private final Class<Implementation> implementation;

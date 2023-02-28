@@ -4,7 +4,7 @@ import com.epiphany.context.exception.*;
 
 import java.util.*;
 
-public class InjectionProviders {
+class InjectionProviders {
 
     private final Map<Class<?>, Provider<?>> impl;
 

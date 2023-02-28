@@ -5,7 +5,7 @@ import java.util.stream.Stream;
 
 import static java.util.Arrays.stream;
 
-public final class InjectStream<T extends AnnotatedElement> {
+final class InjectStream<T extends AnnotatedElement> {
 
     private final T[] content;
 

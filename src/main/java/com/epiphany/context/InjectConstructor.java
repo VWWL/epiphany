@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 import static com.epiphany.general.Exceptions.evaluate;
 import static java.util.Arrays.stream;
 
-public class InjectConstructor<Type> {
+class InjectConstructor<Type> {
 
     private final Constructor<Type> impl;
 
