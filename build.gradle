@@ -143,8 +143,9 @@ publishing {
                 url = "https://github.com/neilwangweili/epiphany"
                 licenses {
                     license {
-                        name = "MIT LICENSE"
-                        url = "https://github.com/neilwangweili/epiphany"
+                        name = 'The Apache Software License, Version 2.0'
+                        url = 'http://www.apache.org/license/LICENSE-2.0.txt'
+                        distribution = 'repo'
                     }
                 }
                 developers {
