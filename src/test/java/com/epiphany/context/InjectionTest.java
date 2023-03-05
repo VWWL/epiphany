@@ -179,6 +179,13 @@ public class InjectionTest {
                 assertNull(component.dependency());
             }
 
+            @Test
+            void should_inject_provider_via_inject_method() {
+                ProviderInjectMethod instance = (new GeneralInjectionProvider<>(ProviderInjectMethod.class)).get(context);
+                assertNotNull(instance.provider());
+                assertSame(dependencyProvider, instance.provider());
+            }
+
         }
 
         @Nested

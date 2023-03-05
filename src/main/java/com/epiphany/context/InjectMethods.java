@@ -31,7 +31,11 @@ class InjectMethods {
 
     @SuppressWarnings("all")
     public Object[] toDependencies(final Context context, final Executable executable) {
-        return stream(executable.getParameters()).map(Parameter::getType).map(context::get).map(Optional::get).toArray(Object[]::new);
+        return stream(executable.getParameters()).map(p -> {
+            java.lang.reflect.Type type = p.getParameterizedType();
+            if (type instanceof ParameterizedType) return context.get((ParameterizedType) type);
+            return context.get((Class<?>) type);
+        }).map(Optional::get).toArray(Object[]::new);
     }
 
     private <Type> List<Method> initInjectMethods(final Class<Type> component) {
