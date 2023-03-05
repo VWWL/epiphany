@@ -116,6 +116,13 @@ public class InjectionTest {
                 assertThat(provider.dependencies()).containsExactly(Dependency.class);
             }
 
+            @Test
+            void should_inject_provider_via_inject_field() {
+                ProviderInjectField instance = (new GeneralInjectionProvider<>(ProviderInjectField.class)).get(context);
+                assertNotNull(instance.provider());
+                assertSame(dependencyProvider, instance.provider());
+            }
+
         }
 
         @Nested

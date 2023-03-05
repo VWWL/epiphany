@@ -3,7 +3,7 @@ package com.epiphany.context;
 import com.epiphany.context.exception.IllegalComponentException;
 
 import java.lang.reflect.*;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static com.epiphany.general.Exceptions.execute;
@@ -21,8 +21,15 @@ class InjectFields {
     public <Type> void injectInto(final Context context, final Type instance) {
         for (Field field : impl) {
             field.setAccessible(true);
-            execute(() -> field.set(instance, context.get(field.getType()).get())).run();
+            execute(() -> field.set(instance, getByType(context, field).get())).run();
         }
+    }
+
+    @SuppressWarnings("all")
+    private Optional<?> getByType(Context context, Field field) {
+        java.lang.reflect.Type type = field.getGenericType();
+        if (type instanceof ParameterizedType) return context.get((ParameterizedType) type);
+        return context.get((Class) type);
     }
 
     public Stream<? extends Class<?>> dependencies() {
