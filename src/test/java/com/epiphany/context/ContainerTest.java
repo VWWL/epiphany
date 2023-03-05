@@ -1,11 +1,13 @@
 package com.epiphany.context;
 
+import com.epiphany.InjectionProvider;
 import com.epiphany.context.exception.*;
 import com.epiphany.context.source.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -69,6 +71,32 @@ public class ContainerTest {
                 Optional<Dependency> dependency = config.context().get(Dependency.class);
                 assertTrue(dependency.isPresent());
                 assertThat(dependency.get()).isInstanceOf(Dependency.class);
+            }
+
+            @Test
+            void should_retrieve_component_binded_type_as_provider() {
+                Component component = new Component() {};
+                config.bind(Component.class, component);
+                ParameterizedType type = new TypeLiteral<Provider<Component>>() {}.getType();
+                Optional<InjectionProvider> provider = config.context().get(type);
+                assertSame(component, provider.get().get());
+            }
+
+            @Test
+            void should_not_retrieve_bind_type_as_unsupported_container() {
+                Component component = new Component() {};
+                config.bind(Component.class, component);
+                ParameterizedType type = new TypeLiteral<List<Component>>() {}.getType();
+                Optional<InjectionProvider> provider = config.context().get(type);
+                assertFalse(provider.isPresent());
+            }
+
+            public abstract class TypeLiteral<T> {
+
+                public ParameterizedType getType() {
+                    return (ParameterizedType) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+                }
+
             }
 
         }
