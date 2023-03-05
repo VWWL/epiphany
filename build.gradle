@@ -144,7 +144,7 @@ publishing {
                 licenses {
                     license {
                         name = "MIT LICENSE"
-                        url = "https://github.com/neilwangweili/epiphany"
+                        url = "https://opensource.org/license/mit/"
                         distribution = 'repo'
                     }
                 }
