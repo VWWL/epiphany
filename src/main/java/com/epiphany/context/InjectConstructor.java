@@ -23,7 +23,11 @@ class InjectConstructor<Type> {
 
     @SuppressWarnings("all")
     public Type newInstance(final Context context, final InjectFields injectFields, final InjectMethods injectMethods) {
-        Object[] dependencies = stream(impl.getParameters()).map(Parameter::getType).map(context::get).map(Optional::get).toArray(Object[]::new);
+        Object[] dependencies = stream(impl.getParameters()).map(p -> {
+            java.lang.reflect.Type type = p.getParameterizedType();
+            if (type instanceof ParameterizedType) return context.get((ParameterizedType) type);
+            return context.get((Class<?>) type);
+        }).map(Optional::get).toArray(Object[]::new);
         Type instance = evaluate(() -> impl.newInstance(dependencies)).evaluate();
         injectFields.injectInto(context, instance);
         injectMethods.injectInto(context, instance);

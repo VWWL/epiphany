@@ -1,5 +1,6 @@
 package com.epiphany.context;
 
+import com.epiphany.InjectionProvider;
 import com.epiphany.context.exception.IllegalComponentException;
 import com.epiphany.context.source.*;
 import org.junit.jupiter.api.*;
@@ -7,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,11 +22,14 @@ public class InjectionTest {
     private @Mock Dependency dependency;
     private @Mock Component componentInstance;
     private @Mock Context context;
+    private @Mock InjectionProvider<Dependency> dependencyProvider;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws NoSuchFieldException {
         when(context.get(Dependency.class)).thenReturn(Optional.of(dependency));
         when(context.get(Component.class)).thenReturn(Optional.of(componentInstance));
+        ParameterizedType providerType = (ParameterizedType) InjectionTest.class.getDeclaredField("dependencyProvider").getGenericType();
+        when(context.get(providerType)).thenReturn(Optional.of(dependencyProvider));
     }
 
     @Nested
@@ -49,6 +54,13 @@ public class InjectionTest {
             void should_include_dependency_from_inject_constructor() {
                 GeneralInjectionProvider<ComponentWithInjectConstructor> provider = new GeneralInjectionProvider<>(ComponentWithInjectConstructor.class);
                 assertThat(provider.dependencies()).containsExactly(Dependency.class);
+            }
+
+            @Test
+            void should_inject_provider_via_inject_constructor() {
+                ProviderInjectConstructor instance = (new GeneralInjectionProvider<>(ProviderInjectConstructor.class)).get(context);
+                assertNotNull(instance.provider());
+                assertSame(dependencyProvider, instance.provider());
             }
 
         }
