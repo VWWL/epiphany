@@ -190,6 +190,16 @@ public class ContainerTest {
     @Nested
     public class DependenciesSelection {
 
+        @Nested
+        public class ProviderType {
+
+        }
+
+        @Nested
+        public class Qualifer {
+
+        }
+
     }
 
     @Nested
